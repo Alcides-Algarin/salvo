@@ -1,11 +1,12 @@
-package com.codeoftheweb.salvo;
+package com.codeoftheweb.salvo.model;
 
 
+import com.codeoftheweb.salvo.model.GamePlayer;
 import org.hibernate.annotations.GenericGenerator;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Player {
@@ -19,6 +20,11 @@ public class Player {
     private String email;
     private String password;
 
+    //Relacion con la clase GamePlayer: Un jugador puede jugar muchos juegos
+    @OneToMany(mappedBy="player", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
+    Set<GamePlayer> Players= new HashSet<>();
+
+    //Constructores
     public Player() { }
 
     public Player(String name, String email, String password ) {
@@ -27,7 +33,6 @@ public class Player {
         this.email= email;
         this.password=password;
     }
-
 
     //Method getter
     public String getName() {
