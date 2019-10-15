@@ -1,5 +1,6 @@
 package com.codeoftheweb.salvo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -17,14 +18,16 @@ public class Game {
     private LocalDateTime creationDate;
 
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
-    Set<GamePlayer> games= new HashSet<>();
+    Set<GamePlayer> gamePlayers = new HashSet<>();
 
+    //contructores
     public Game(){}
 
     public Game(LocalDateTime creationDate ) {
         this.creationDate = creationDate;
     }
 
+    //Getters
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
@@ -32,7 +35,12 @@ public class Game {
     public long getId() {
         return id;
     }
+    @JsonIgnore
+    public Set<GamePlayer> getGames() {
+        return gamePlayers;
+    }
 
+    //Setters
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }

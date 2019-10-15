@@ -32,19 +32,26 @@ public class SalvoApplication {
             Player tony= new Player("Tony", "t.almeida@ctu.gov","mole");
 
             //Games
-            Game hora1=new Game(LocalDateTime.now());
+            Game game1=new Game(LocalDateTime.now());
+            Game game2=new Game(LocalDateTime.now().plusHours(1));
+            Game game3=new Game(LocalDateTime.now().plusHours(2));
 
-            // save a couple of customers
+
+            //players
             playerRepository.save(jack);
             playerRepository.save(chole);
             playerRepository.save(kim);
             playerRepository.save(tony);
 
-            gameRepository.save(hora1);
-            gameRepository.save(new Game(LocalDateTime.now().plusHours(1)));
-            gameRepository.save(new Game(LocalDateTime.now().plusHours(2)));
+            //games
+            gameRepository.save(game1);
+            gameRepository.save(game2);
+            gameRepository.save(game3);
 
-            //gamePlayerRepository.save(new GamePlayer(jack,hora1, );
+
+            gamePlayerRepository.save(new GamePlayer(jack,game1,LocalDateTime.now()));
+            gamePlayerRepository.save(new GamePlayer(chole,game2,LocalDateTime.now().plusHours(1)));
+            gamePlayerRepository.save(new GamePlayer(kim,game3,LocalDateTime.now().plusHours(2)));
 
 
         };

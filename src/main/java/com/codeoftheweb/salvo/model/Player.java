@@ -2,6 +2,7 @@ package com.codeoftheweb.salvo.model;
 
 
 import com.codeoftheweb.salvo.model.GamePlayer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -22,7 +23,7 @@ public class Player {
 
     //Relacion con la clase GamePlayer: Un jugador puede jugar muchos juegos
     @OneToMany(mappedBy="player", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
-    Set<GamePlayer> Players= new HashSet<>();
+    Set<GamePlayer> gamePlayers= new HashSet<>();
 
     //Constructores
     public Player() { }
@@ -44,6 +45,11 @@ public class Player {
     }
     public String getPassword() {
         return password;
+    }
+
+    @JsonIgnore
+    public Set<GamePlayer> getPlayers() {
+        return gamePlayers;
     }
 
     //Method setter

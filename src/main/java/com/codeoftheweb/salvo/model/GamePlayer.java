@@ -14,7 +14,7 @@ public class GamePlayer {
     private long id;
     private LocalDateTime joinDate;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade= CascadeType.ALL )
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="player_id")
     private Player player;
 
@@ -23,6 +23,7 @@ public class GamePlayer {
     @JoinColumn(name="game_id")
     private Game game;
 
+    //constructor
     public GamePlayer(){}
 
     public GamePlayer(Player player, Game game, LocalDateTime creationDate) {
@@ -31,7 +32,18 @@ public class GamePlayer {
         this.joinDate=creationDate;
     }
 
+    //metodos get
     public LocalDateTime getCreationDate() {
         return joinDate;
     }
+
+
+    public Game getGame() {
+        return game;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
 }
