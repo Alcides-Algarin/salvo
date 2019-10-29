@@ -2,7 +2,6 @@
  *
  */
 package com.codeoftheweb.salvo.model;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -28,7 +27,7 @@ public class Game {
     private LocalDateTime creationDate;
 
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
-    Set<GamePlayer> gamePlayers = new HashSet<>();
+    private Set<GamePlayer> gamePlayers = new HashSet<>();
 
     /*===================
     =====================
@@ -72,8 +71,8 @@ public class Game {
     }
 
 
-    public Set<Player> getPlayers() {
-        return this.gamePlayers.stream().map(GamePlayer::getPlayer).collect(Collectors.toSet());
+    public Set<GamePlayer> getGamePlayers() {
+        return this.gamePlayers;
     }
 
 

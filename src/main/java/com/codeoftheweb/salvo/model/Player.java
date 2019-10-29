@@ -68,11 +68,11 @@ public class Player {
     //segundo con el tipo de dato que retorna el método
     //tercero con el nombre del métodos y sus parámetros
 
-    public Map<String, Object> playersDTO(){
+    public Map<String, Object> playerDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("id", this.id);
-        dto.put("name", this.name);
-        dto.put("email", this.email);
+        dto.put("name", this.getName());
+        dto.put("email", this.getEmail());
         return dto;
     }
 

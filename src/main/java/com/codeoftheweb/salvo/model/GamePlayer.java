@@ -1,11 +1,11 @@
 
 package com.codeoftheweb.salvo.model;
+import com.codeoftheweb.salvo.SalvoController;
 import org.hibernate.ObjectDeletedException;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 public class GamePlayer {
@@ -19,8 +19,8 @@ public class GamePlayer {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
-    private LocalDateTime joinDate;
 
+    private LocalDateTime joinDate;
 
     //Relacion con player y game
     @ManyToOne(fetch = FetchType.EAGER)
@@ -31,6 +31,8 @@ public class GamePlayer {
     @JoinColumn(name="game_id")
     private Game game;
 
+    @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
+    private Set<Ship> ships = new HashSet<>();
     /*===================
     =====================
         Constructores
@@ -46,23 +48,53 @@ public class GamePlayer {
     }
 
     //metodos get
-    public LocalDateTime getCreationDate() {
+
+    public long getId() {
+        return id;
+    }
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getJoinDate() {
         return joinDate;
     }
 
+    public void setJoinDate(LocalDateTime joinDate) {
+        this.joinDate = joinDate;
+    }
+
+
     public Game getGame() {
-        return this.game;
+        return game;
+    }
+    public void setGame(Game game) {
+        this.game= game;
     }
 
     public Player getPlayer() {
-        return this.player;
+        return player;
+    }
+    public void setPlayer(Player player) {
+        this.player= player;
+    }
+
+    public void addShip(Ship ship){
+        this.ships.add(ship);
+        ship.setGamePlayer(this);
+    }
+
+    public Set<Ship> getShips(){
+        return this.ships;
     }
 
     //dto
     public Map<String, Object> gamePlayerDTO(){
-        Map<String,Object> dto = new HashMap<>();
-        dto.put("id", this.id);
-        dto.put("player", this.player.playersDTO() );
+        Map<String,Object> dto = new LinkedHashMap<>();
+        dto.put("id", this.getId());
+        dto.put("player", this.getPlayer().playerDTO() );
         return dto;
     }
+
+
 }
