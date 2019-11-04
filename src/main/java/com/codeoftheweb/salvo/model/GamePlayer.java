@@ -33,6 +33,9 @@ public class GamePlayer {
 
     @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
     private Set<Ship> ships = new HashSet<>();
+
+    @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
+    private Set<Salvo> salvoes = new HashSet<>();
     /*===================
     =====================
         Constructores
@@ -79,13 +82,24 @@ public class GamePlayer {
         this.player= player;
     }
 
+    //metodo para agregar ships
     public void addShip(Ship ship){
         this.ships.add(ship);
         ship.setGamePlayer(this);
     }
 
+    //metodo para agregar salvos
+    public void addSalvo(Salvo salvo){
+        this.salvoes.add(salvo);
+        salvo.setGamePlayer(this);
+    }
+
     public Set<Ship> getShips(){
         return this.ships;
+    }
+
+    public Set<Salvo> getSalvoes(){
+        return this.salvoes;
     }
 
     //dto

@@ -21,17 +21,14 @@
     background-repeat: no-repeat;
 }
 
-
 #grid{
     background-image: url(../assets/ocean.gif);
     background-size: cover;
     border: 2px solid rgb(128,128,128);
     border-radius: 0 0 10px 10px;
     height: 330px;
-    width: 330px;
-    
+    width: 330px; 
 }
-
 
 .grid-wrapper{
     display: absolute;

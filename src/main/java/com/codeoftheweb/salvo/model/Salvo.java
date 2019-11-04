@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-public class Ship {
+public class Salvo {
     /*===================
     =====================
         Atributos
@@ -18,43 +18,43 @@ public class Ship {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
-    private long id; //notacion para indicarle a Spring que autogenere el id
+    private long id;
 
-    private String type;//podria algun tipo de dato ENUM para poner lso distintos tipos de ship que estan disponibles
+    private int turNumber;// para el numero de turno
 
     @ElementCollection
-    private List<String> locations = new ArrayList<>();
+    private List<String> locationSalvo = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="gamePlayer_id")
     private GamePlayer gamePlayer;
 
 
-    public Ship() { }
+    public Salvo(){ }
 
-    public Ship(String type, List<String> locations) {
-        this.type = type;
-        this.locations = locations;
+    public Salvo( int turNumber, List<String> locationSalvo){
+        this.turNumber= turNumber;
+        this.locationSalvo= locationSalvo;
     }
 
     public long getId() {
         return this.id;
     }
 
-    public String getType() {
-        return this.type;
+    public int getTurNumber(){
+        return this.turNumber;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTurNumber(int turNumber){
+        this.turNumber= turNumber;
     }
 
-    public List<String> getLocations() {
-        return this.locations;
+    public  List<String> getLocationSalvo(){
+        return this.locationSalvo;
     }
 
-    public void setLocations(List<String> locations) {
-        this.locations = locations;
+    public void setLocationSalvo( List<String> locationSalvo){
+        this.locationSalvo= locationSalvo;
     }
 
     public GamePlayer getGamePlayer(){
@@ -62,13 +62,13 @@ public class Ship {
     }
 
     public void setGamePlayer(GamePlayer gamePlayer){
-        this.gamePlayer = gamePlayer;
+        this.gamePlayer=gamePlayer;
     }
 
-    public Map<String, Object> shipDTO(){
+    public Map<String, Object> salvoDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
-        dto.put("type", this.getType());
-        dto.put("locations", this.getLocations());
+        dto.put("turnNumber", this.getTurNumber());
+        dto.put("locationSalvo", this.getLocationSalvo());
         return dto;
     }
 }

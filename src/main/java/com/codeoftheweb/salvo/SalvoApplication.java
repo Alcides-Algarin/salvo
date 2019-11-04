@@ -1,9 +1,6 @@
 package com.codeoftheweb.salvo;
 
-import com.codeoftheweb.salvo.model.Game;
-import com.codeoftheweb.salvo.model.GamePlayer;
-import com.codeoftheweb.salvo.model.Player;
-import com.codeoftheweb.salvo.model.Ship;
+import com.codeoftheweb.salvo.model.*;
 import com.codeoftheweb.salvo.repository.GameRepository;
 import com.codeoftheweb.salvo.repository.PlayerRepository;
 import com.codeoftheweb.salvo.repository.GamePlayerRepository;
@@ -38,6 +35,12 @@ public class SalvoApplication {
             Game game1=new Game(LocalDateTime.now());
             Game game2=new Game(LocalDateTime.now().plusHours(1));
             Game game3=new Game(LocalDateTime.now().plusHours(2));
+            Game game4=new Game(LocalDateTime.now().plusHours(3));
+            Game game5=new Game(LocalDateTime.now().plusHours(4));
+            Game game6=new Game(LocalDateTime.now().plusHours(5));
+            Game game7=new Game(LocalDateTime.now().plusHours(6));
+            Game game8=new Game(LocalDateTime.now().plusHours(7));
+            Game game9=new Game(LocalDateTime.now().plusHours(8));
 
 
             //players Repository
@@ -61,14 +64,55 @@ public class SalvoApplication {
             GamePlayer gp5= gamePlayerRepository.save(new GamePlayer(kim,game3,LocalDateTime.now().plusHours(2)));
             GamePlayer gp6= gamePlayerRepository.save(new GamePlayer(jack,game3,LocalDateTime.now().plusHours(2)));
 
+            // ship location GAMEPLAYER1
             gp1.addShip(new Ship("destroyer", Arrays.asList("A1","A2","A3")));
             gp1.addShip(new Ship("submarine", Arrays.asList("C1","C2","C3","C4")));
             gp1.addShip(new Ship("patrol_boat", Arrays.asList("F7","G7")));
             gp1.addShip(new Ship("carrier", Arrays.asList("A10","B10","C10","D10","E10")));
             gp1.addShip(new Ship("battleship", Arrays.asList("I1","I2","I3")));
 
+            // ship location GAMEPLAYER2
             gp2.addShip(new Ship("destroyer", Arrays.asList("H1","I1","J1")));
             gp2.addShip(new Ship("submarine", Arrays.asList("D4","D5","D6","D7")));
+            gp2.addShip(new Ship("patrol_boat", Arrays.asList("F7","G7")));
+            gp2.addShip(new Ship("carrier", Arrays.asList("A10","B10","C10","D10","E10")));
+            gp2.addShip(new Ship("battleship", Arrays.asList("I4","I5","I6")));
+
+            // ship location GAMEPLAYER4
+            gp3.addShip(new Ship("destroyer", Arrays.asList("A1","A2","A3")));
+            gp3.addShip(new Ship("submarine", Arrays.asList("C1","C2","C3","C4")));
+            gp3.addShip(new Ship("patrol_boat", Arrays.asList("F7","G7")));
+            gp3.addShip(new Ship("carrier", Arrays.asList("A10","B10","C10","D10","E10")));
+            gp3.addShip(new Ship("battleship", Arrays.asList("I1","I2","I3")));
+
+            // ship location GAMEPLAYER4
+            gp4.addShip(new Ship("destroyer", Arrays.asList("A1","A2","A3")));
+            gp4.addShip(new Ship("submarine", Arrays.asList("C1","C2","C3","C4")));
+            gp4.addShip(new Ship("patrol_boat", Arrays.asList("F7","G7")));
+            gp4.addShip(new Ship("carrier", Arrays.asList("A10","B10","C10","D10","E10")));
+            gp4.addShip(new Ship("battleship", Arrays.asList("I1","I2","I3")));
+
+            // ship location GAMEPLAYER5
+            gp5.addShip(new Ship("destroyer", Arrays.asList("A1","A2","A3")));
+            gp5.addShip(new Ship("submarine", Arrays.asList("C1","C2","C3","C4")));
+            gp5.addShip(new Ship("patrol_boat", Arrays.asList("F7","G7")));
+            gp5.addShip(new Ship("carrier", Arrays.asList("A10","B10","C10","D10","E10")));
+            gp5.addShip(new Ship("battleship", Arrays.asList("I1","I2","I3")));
+
+            // ship location GAMEPLAYER4
+            gp6.addShip(new Ship("destroyer", Arrays.asList("I1","I2","I3")));
+            gp6.addShip(new Ship("submarine", Arrays.asList("A9","B9","C9","D9")));
+            gp6.addShip(new Ship("patrol_boat", Arrays.asList("F7","G7")));
+            gp6.addShip(new Ship("carrier", Arrays.asList("A10","B10","C10","D10","E10")));
+            gp6.addShip(new Ship("battleship", Arrays.asList("A1","A2","A3")));
+
+
+            //salvo location GAMEPLAYER!
+            gp1.addSalvo(new Salvo(1,Arrays.asList("I1","I2","I3","J5","D3")));
+            gp2.addSalvo(new Salvo(1,Arrays.asList("D1","C2","F3","J3","D5")));
+            gp1.addSalvo(new Salvo(2,Arrays.asList("H1","A2","F3","E5","G3")));
+            gp2.addSalvo(new Salvo(2,Arrays.asList("E1","D2","F3","J5","D3")));
+            gp1.addSalvo(new Salvo(3,Arrays.asList("A1","J2","I3","J5","D3")));
 
             gamePlayerRepository.save(gp1);
             gamePlayerRepository.save(gp2);
@@ -76,43 +120,6 @@ public class SalvoApplication {
             gamePlayerRepository.save(gp4);
             gamePlayerRepository.save(gp5);
             gamePlayerRepository.save(gp6);
-
-
-            /*
-	        @Bean
-	        public CommandLineRunner initData(PlayerRepository playerRepository, GameRepository gameRepository, GamePlayerRepository gamePlayerRepository) {
-		    return (args) -> {
-
-			Player jack = playerRepository.save(new Player("j.bauer@ctu.gov", "Jack", "Bauer"));
-			Player chloe = playerRepository.save(new Player("c.obrian@ctu.gov", "Chloe", "O'Brian"));
-			Player kim = playerRepository.save(new Player("kim_bauer@gmail.com", "Kim", "Bauer"));
-			Player tony = playerRepository.save(new Player("t.almeida@ctu.gov", "Tony", "Almeida"));
-
-			Game game1 = gameRepository.save(new Game(LocalDateTime.now()));
-			Game game2 = gameRepository.save(new Game(LocalDateTime.now().plusHours(1)));
-			Game game3 = gameRepository.save(new Game(LocalDateTime.now().plusHours(2)));
-
-			GamePlayer gp1 = gamePlayerRepository.save(new GamePlayer(game1,jack,LocalDateTime.now()));
-			GamePlayer gp2 = gamePlayerRepository.save(new GamePlayer(game1,chloe,LocalDateTime.now()));
-			GamePlayer gp3 = gamePlayerRepository.save(new GamePlayer(game2,kim,LocalDateTime.now()));
-			GamePlayer gp4 = gamePlayerRepository.save(new GamePlayer(game2,tony,LocalDateTime.now()));
-			GamePlayer gp5 = gamePlayerRepository.save(new GamePlayer(game3,jack,LocalDateTime.now()));
-
-			gp1.addShip(new Ship("destroyer", Arrays.asList("A1","A2","A3")));
-			gp1.addShip(new Ship("submarine", Arrays.asList("C1","C2","C3","C4")));
-			gp1.addShip(new Ship("patrol_boat", Arrays.asList("F7","G7")));
-			gp1.addShip(new Ship("carrier", Arrays.asList("A10","B10","C10","D10","E10")));
-			gp1.addShip(new Ship("battleship", Arrays.asList("I1","I2","I3")));
-
-			gp2.addShip(new Ship("destroyer", Arrays.asList("H1","I1","J1")));
-			gp2.addShip(new Ship("submarine", Arrays.asList("D4","D5","D6","D7")));
-
-			gamePlayerRepository.save(gp1);
-			gamePlayerRepository.save(gp2);
-
-		};
-	}
-            */
 
         };
     }

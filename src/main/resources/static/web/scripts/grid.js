@@ -105,12 +105,10 @@ const createGrid = function(size, element, id){
       checkBusyCells(ship, ev.target)
       
     }
-
-
-
 }
 
 createGrid(11, document.getElementById('grid'), 'ships')
+createGrid(11, document.getElementById('grid2'), 'salvo')
 
 
 function checkBusyCells(ship, cell){
@@ -133,10 +131,3 @@ function checkBusyCells(ship, cell){
         }
     }
 }
-
-
-
-
-
-
-

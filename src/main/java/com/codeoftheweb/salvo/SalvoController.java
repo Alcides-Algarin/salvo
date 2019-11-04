@@ -4,10 +4,7 @@
  */
 package com.codeoftheweb.salvo;
 
-import com.codeoftheweb.salvo.model.Game;
-import com.codeoftheweb.salvo.model.GamePlayer;
-import com.codeoftheweb.salvo.model.Player;
-import com.codeoftheweb.salvo.model.Ship;
+import com.codeoftheweb.salvo.model.*;
 import com.codeoftheweb.salvo.repository.GamePlayerRepository;
 import com.codeoftheweb.salvo.repository.GameRepository;
 
@@ -51,13 +48,11 @@ public class SalvoController {
             dto.put("gamePlayer", gamePlayer.getGame().getGamePlayers().stream().map(GamePlayer::gamePlayerDTO));
             dto.put("player", gamePlayer.getPlayer().getName());
             dto.put("ships", gamePlayer.getShips().stream().map(Ship::shipDTO));
-
+            dto.put("salvoes", gamePlayer.getSalvoes().stream().map(Salvo::salvoDTO));
         }else{
             dto.put("error", "no such game");
         }
-
         return dto;
-
-
     }
+
 }

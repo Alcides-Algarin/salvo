@@ -199,14 +199,14 @@ const createShips = function(shipType, length, orientation, parent, isStatic){
             }
             
         })
-    }
-
-    
+    }  
 }
 
+/*
+//Crea los barcos que estaran en el dock
 createShips('carrier', 5, 'horizontal', document.getElementById('dock'),false)
 createShips('battleship', 4, 'horizontal', document.getElementById('dock'),false)
 createShips('submarine', 3, 'horizontal', document.getElementById('dock'),false)
 createShips('destroyer', 3, 'horizontal', document.getElementById('dock'),false)
 createShips('patrol_boat', 2, 'horizontal', document.getElementById('dock'),false)
-
+*/
