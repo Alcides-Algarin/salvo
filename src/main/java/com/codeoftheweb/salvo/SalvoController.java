@@ -50,7 +50,7 @@ public class SalvoController {
             dto.put("ships", gamePlayer.getShips().stream().map(Ship::shipDTO));
             dto.put("salvoes", gamePlayer.getSalvoes().stream().map(Salvo::salvoDTO));
         }else{
-            dto.put("error", "no such game");
+            dto.put("error", "no such game game");
         }
         return dto;
     }
