@@ -108,11 +108,12 @@ public class SalvoApplication {
 
 
             //salvo location GAMEPLAYER!
-            gp1.addSalvo(new Salvo(1,Arrays.asList("I1","I2","I3","J5","D3")));
-            gp2.addSalvo(new Salvo(1,Arrays.asList("D1","C2","F3","J3","D5")));
+            gp1.addSalvo(new Salvo(1,Arrays.asList("I1","I2","I6","J5","A3")));
             gp1.addSalvo(new Salvo(2,Arrays.asList("H1","A2","F3","E5","G3")));
-            gp2.addSalvo(new Salvo(2,Arrays.asList("E1","D2","F3","J5","D3")));
-            gp1.addSalvo(new Salvo(3,Arrays.asList("A1","J2","I3","J5","D3")));
+            gp1.addSalvo(new Salvo(3,Arrays.asList("A1","J2","I3","D10","D3")));
+
+            gp2.addSalvo(new Salvo(1,Arrays.asList("D1","C2","D10","J3","D5")));
+            gp2.addSalvo(new Salvo(2,Arrays.asList("E1","D2","F5","J5","D3")));
 
             gamePlayerRepository.save(gp1);
             gamePlayerRepository.save(gp2);

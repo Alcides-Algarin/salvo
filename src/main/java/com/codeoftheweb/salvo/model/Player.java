@@ -94,14 +94,15 @@ public class Player {
     }
 
     //Method getter
+    public long getId() { return this.id; }
     public String getName() {
-        return name;
+        return this.name;
     }
     public String getEmail() {
-        return email;
+        return this.email;
     }
     public String getPassword() {//El password tambien lleva metodo getter?!!!!!!!!!!!!!!!!!!!
-        return password;
+        return this.password;
     }
 
     //Method setter

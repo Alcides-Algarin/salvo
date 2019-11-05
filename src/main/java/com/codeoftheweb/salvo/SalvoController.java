@@ -43,12 +43,12 @@ public class SalvoController {
         Map<String,Object> dto = new LinkedHashMap<>();
 
         if(gamePlayer != null){
-            dto.put("id", gamePlayer.getGame().getId());
+            dto.put("gameId", gamePlayer.getGame().getId());
             dto.put("creationDate", gamePlayer.getGame().getCreationDate());
             dto.put("gamePlayer", gamePlayer.getGame().getGamePlayers().stream().map(GamePlayer::gamePlayerDTO));
             dto.put("player", gamePlayer.getPlayer().getName());
             dto.put("ships", gamePlayer.getShips().stream().map(Ship::shipDTO));
-            dto.put("salvoes", gamePlayer.getSalvoes().stream().map(Salvo::salvoDTO));
+            dto.put("salvoes", gamePlayer.getGame().getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream().map(Salvo::salvoDTO)));
         }else{
             dto.put("error", "no such game game");
         }
