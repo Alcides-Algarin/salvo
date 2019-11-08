@@ -36,6 +36,7 @@ public class GamePlayer {
 
     @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
     private Set<Salvo> salvoes = new HashSet<>();
+
     /*===================
     =====================
         Constructores
@@ -54,9 +55,6 @@ public class GamePlayer {
 
     public long getId() {
         return id;
-    }
-    public void setId(long id) {
-        this.id = id;
     }
 
     public LocalDateTime getJoinDate() {
@@ -106,7 +104,14 @@ public class GamePlayer {
     public Map<String, Object> gamePlayerDTO(){
         Map<String,Object> dto = new LinkedHashMap<>();
         dto.put("gpId", this.getId());
-        dto.put("player", this.getPlayer().playerDTO() );
+        dto.put("player", this.getPlayer().playerDTO());
+
+        Score score =this.getPlayer().getScoreByGame(this.getGame());
+        if(score != null){
+            dto.put("score",  score.getPoint());
+        }else {
+            dto.put("score", null);
+        }
         return dto;
     }
 

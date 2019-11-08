@@ -5,6 +5,8 @@
 package com.codeoftheweb.salvo.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.OnDelete;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -37,6 +39,10 @@ public class Player {
     @OneToMany(mappedBy="player", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
     private Set<GamePlayer> gamePlayers= new HashSet<>();
 
+    @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private Set<Score> scores= new HashSet<>();
+
+
     /*===================
     =====================
         Constructores
@@ -61,6 +67,52 @@ public class Player {
         return gamePlayers;
     }*/
 
+    @JsonIgnore
+    public Set<Player> getPlayers(){
+        //lamamos a la propiedad GamePlayers que contiene a todos los gameplayers relacionados con el conductor
+        //la recorremos y por cada una llamamos a su getter de Game, para almacenar cada player
+        //en la lista que devuelve el método.
+        return this.gamePlayers.stream().map(GamePlayer::getPlayer).collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public Set<Game> getGames(){
+        //lamamos a la propiedad GamePlayers que contiene a todos los gameplayers relacionados con el conductor
+        //la recorremos y por cada una llamamos a su getter de Game, para almacenar cada player
+        //en la lista que devuelve el método.
+        return this.gamePlayers.stream().map(GamePlayer::getGame).collect(Collectors.toSet());
+    }
+
+    //Method getter
+    public long getId() { return this.id; }
+    public String getName() {
+        return this.name;
+    }
+    public String getEmail() {
+        return this.email;
+    }
+    @JsonIgnore
+    public String getPassword() {
+        return this.password;
+    }
+
+    //Method setter
+    public void setName(String name) {
+         this.name = name;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Score getScoreByGame(Game game){
+        return this.scores.stream().filter(score -> score.getGame().getId() == game.getId()).findFirst().orElse(null);
+
+    }
+
+
     //DTO: data transfer object. Método para administrar la información de la clase
     //Retorna una Mapa, un tipo de dato que contiene pares de key y value. Parecido a los objetos de JS
     //Los métodos en Java se declaran:
@@ -77,42 +129,34 @@ public class Player {
     }
 
 
+    public Map<String, Object> scoreDTO(){
+    	Map<String, Object> dto = new LinkedHashMap<>();
+		int wons=0;
+		int tied=0;
+		int lost=0;
+		double points = 0.0;
+		String userName=null;
 
+		for(Score score : this.scores){
+			points += score.getPoint();
+			userName= score.getPlayer().getEmail();
 
-    public Set<Player> getPlayers(){
-        //lamamos a la propiedad GamePlayers que contiene a todos los gameplayers relacionados con el conductor
-        //la recorremos y por cada una llamamos a su getter de Game, para almacenar cada player
-        //en la lista que devuelve el método.
-        return this.gamePlayers.stream().map(GamePlayer::getPlayer).collect(Collectors.toSet());
-    }
+			if(score.getPoint()==1){
+				wons++;
+			}else if(score.getPoint()==0){
+				lost++;
+			}else{
+				tied++;
+			}
+		}
 
-    public Set<Game> getGames(){
-        //lamamos a la propiedad GamePlayers que contiene a todos los gameplayers relacionados con el conductor
-        //la recorremos y por cada una llamamos a su getter de Game, para almacenar cada player
-        //en la lista que devuelve el método.
-        return this.gamePlayers.stream().map(GamePlayer::getGame).collect(Collectors.toSet());
-    }
+		dto.put("id", this.id);
+		dto.put("points", points);
+		dto.put("won", wons);
+		dto.put("lost", lost);
+		dto.put("tied", tied);
+		dto.put("userName",userName);
 
-    //Method getter
-    public long getId() { return this.id; }
-    public String getName() {
-        return this.name;
-    }
-    public String getEmail() {
-        return this.email;
-    }
-    public String getPassword() {//El password tambien lleva metodo getter?!!!!!!!!!!!!!!!!!!!
-        return this.password;
-    }
-
-    //Method setter
-    public void setName(String name) {
-         this.name = name;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    	return dto;
+	}
 }

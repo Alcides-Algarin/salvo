@@ -1,10 +1,7 @@
 package com.codeoftheweb.salvo;
 
 import com.codeoftheweb.salvo.model.*;
-import com.codeoftheweb.salvo.repository.GameRepository;
-import com.codeoftheweb.salvo.repository.PlayerRepository;
-import com.codeoftheweb.salvo.repository.GamePlayerRepository;
-import com.codeoftheweb.salvo.repository.ShipRepository;
+import com.codeoftheweb.salvo.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,7 +19,7 @@ public class SalvoApplication {
 
 
     @Bean
-    public CommandLineRunner initData(PlayerRepository playerRepository, GameRepository gameRepository, GamePlayerRepository gamePlayerRepository) {
+    public CommandLineRunner initData(PlayerRepository playerRepository, GameRepository gameRepository, GamePlayerRepository gamePlayerRepository, ScoreRepository scoreRepository) {
         return (args) -> {
 
             //Players
@@ -115,12 +112,25 @@ public class SalvoApplication {
             gp2.addSalvo(new Salvo(1,Arrays.asList("D1","C2","D10","J3","D5")));
             gp2.addSalvo(new Salvo(2,Arrays.asList("E1","D2","F5","J5","D3")));
 
+
+
+            scoreRepository.save(new Score(jack, game1, LocalDateTime.now(),1));
+            scoreRepository.save(new Score(chole, game1, LocalDateTime.now(),0));
+
+            scoreRepository.save(new Score(chole, game2, LocalDateTime.now(),1));
+            scoreRepository.save(new Score(tony, game2, LocalDateTime.now(),0));
+
+            scoreRepository.save(new Score(kim,game3,LocalDateTime.now().plusHours(2), 0.5));
+            //scoreRepository.save(new Score(jack,game3,LocalDateTime.now().plusHours(2), 0.5));
+
             gamePlayerRepository.save(gp1);
             gamePlayerRepository.save(gp2);
             gamePlayerRepository.save(gp3);
             gamePlayerRepository.save(gp4);
             gamePlayerRepository.save(gp5);
             gamePlayerRepository.save(gp6);
+
+
 
         };
     }

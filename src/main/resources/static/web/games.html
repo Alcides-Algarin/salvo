@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Games</title>
+    <style>
+        table, th, td {
+          border: 1px solid black;
+          border-collapse: collapse;
+        }
+</style>
 </head>
 <body>
     <h1>SALVO!!!</h1>
@@ -13,7 +19,7 @@
     <table >
         <thead>
             <tr>
-                <th>Game</th>
+                <th>Game Id</th>
                 <th>Fecha creacion</th>
                 <th>Players</th>
             </tr>
@@ -22,6 +28,42 @@
 
         </tbody>
     </table>
+
+    <h3>Leaderboard</h3>
+    <p>Tabla creadad desde frontEnd</p>
+    
+    <table >
+        <thead>
+            <tr>
+                <th>User name</th>
+                <th>points</th>
+                <th>won</th>
+                <th>Lost</th>
+                <th>tied</th>
+            </tr>
+        </thead>
+        <tbody id="tableScores">
+
+        </tbody>
+    </table>
+    <br>
+        <h3>Leaderboard</h3>
+    <p>Tabla creadad desde BackEnd</p>
+    <table >
+        <thead>
+            <tr>
+                <th>User name</th>
+                <th>points</th>
+                <th>won</th>
+                <th>Lost</th>
+                <th>tied</th>
+            </tr>
+        </thead>
+        <tbody id="tableScores2">
+
+        </tbody>
+    </table>
+
 </body>
 <script src="scripts/games.js"></script>
 </html>

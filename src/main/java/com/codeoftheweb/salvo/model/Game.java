@@ -29,6 +29,10 @@ public class Game {
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
     private Set<GamePlayer> gamePlayers = new HashSet<>();
 
+	@OneToMany(mappedBy="game", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
+	private Set<Score> scores= new HashSet<>();
+
+
     /*===================
     =====================
         Constructores
@@ -46,13 +50,15 @@ public class Game {
         Métodos
     =====================
     =====================*/
+  
 
     //DTO
     public Map<String,Object> gameDTO(){
         Map<String,Object> dto = new HashMap<>();
+		dto.put("gameId", this.id);
         dto.put("created", this.creationDate);
-        dto.put("id", this.id);
         dto.put("gamePlayers", this.gamePlayers.stream().map(GamePlayer::gamePlayerDTO));
+
         return dto;
     }
 
