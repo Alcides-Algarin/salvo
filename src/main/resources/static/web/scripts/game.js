@@ -46,8 +46,6 @@ function infoGame(data){
 
 function getShips(ships){
 
-
-
 	ships.forEach(ship => {
 
 		ship.locations.forEach(loc => shipLocation.push(loc))
@@ -58,7 +56,7 @@ function getShips(ships){
 					ship.locations[0][0] == ship.locations[1][0] ? "horizontal" : "vertical",
 					document.getElementById(`ships${ship.locations[0]}`),
 					true
-					)
+		)
 	})
 }
 

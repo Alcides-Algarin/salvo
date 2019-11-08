@@ -30,10 +30,7 @@ function createTableLeaderBoard2(){
                   <td>${p.lost}</td>
                   <td>${p.tied}</td>
                 </tr>
-
-
-    `
-
+                      `
   })
 }
 
@@ -59,8 +56,6 @@ fetch( "/api/games").then(function(response) {
   // Se llama cuando se produce un error en cualquier punto de la cadena
   console.log( "Request failed: " + error.message );
 });
-
-
 
 
 
@@ -150,8 +145,6 @@ function createTableLeaderBoard(){
                   <td>${player.lost}</td>
                   <td>${player.tied}</td>
                 </tr>
-
-
     `
 
   })
