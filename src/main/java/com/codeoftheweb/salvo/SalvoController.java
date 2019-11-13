@@ -8,10 +8,15 @@ import com.codeoftheweb.salvo.repository.PlayerRepository;
 import com.codeoftheweb.salvo.repository.ScoreRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.Authenticator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,22 +41,20 @@ public class SalvoController {
 	private PlayerRepository playerRepository;
 
     @RequestMapping("/games")
-    private List<Map<String, Object>> getGames() {
-        return gameRepository.findAll().stream().map(Game::gameDTO).collect(Collectors.toList());
+    public Map<String, Object> getGames(Authentication authentication) {
+    	Map<String, Object> dto = new HashMap<>();
+    	if (!this.isGuest(authentication)) {
+			dto.put("Player", playerRepository.findByEmail(authentication.getName()).playerDTO());
+		}else {
+			dto.put("player", "guest");
+		}
+    	dto.put("games", gameRepository.findAll().stream().map(Game::gameDTO).collect(Collectors.toList()));
+    	return dto;
+        //return gameRepository.findAll().stream().map(Game::gameDTO).collect(Collectors.toList());
     }
 
-    //Este bloque de codigo me retorna el json de scores
-	/* La tabla de clasificación, por otro lado, quiere datos como este:
-	 *
-	 *     una lista de jugadores
-	 *     para cada jugador,
-	 *         una puntuación total
-	 *         un número total de victorias
-	 *         un número total de pérdidas
-	 *         un número total de vínculos
-	 */
 	@RequestMapping("/scores")
-	private List<Map<String, Object>> getScores() {
+	public List<Map<String, Object>> getScores() {
 		return playerRepository.findAll().stream().map(Player::scoreDTO).collect(Collectors.toList());//QUE HACE ESTO?
 	}
 
@@ -59,6 +62,12 @@ public class SalvoController {
     public Map<String,Object> getGameView(@PathVariable long gamePlayerId){
         return this.gameViewDTO(gamePlayerRepository.findById(gamePlayerId).orElse(null));
     }
+
+    private boolean isGuest(Authentication authentication){
+
+    	return authentication == null || authentication instanceof AnonymousAuthenticationToken;
+
+	}
 
     private Map<String,Object> gameViewDTO(GamePlayer gamePlayer){
         Map<String,Object> dto = new LinkedHashMap<>();
@@ -77,5 +86,49 @@ public class SalvoController {
     }
 
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@RequestMapping(path = "/players", method = RequestMethod.POST)
+	public ResponseEntity<Map<String,Object>> createUser(@RequestParam String userName, @RequestParam String email, @RequestParam String password) {
+
+		ResponseEntity<Map<String,Object>> response;
+		Player player = playerRepository.findByEmail(email);
+
+		if (email.isEmpty() || password.isEmpty()) {
+			response = new ResponseEntity<>(makeMap(" Error", "no name or password"), HttpStatus.FORBIDDEN);
+
+		}else if (player !=  null) {
+			response = new ResponseEntity<>(makeMap(" Error", "userName already exists"), HttpStatus.FORBIDDEN);
+		}else{
+			Player newPlayer=  playerRepository.save(new Player(userName, email, passwordEncoder.encode(password)));
+			response = new ResponseEntity<>(makeMap("id", newPlayer.getId()), HttpStatus.CREATED);
+		}
+
+		return response;
+	}
+
+	private Map<String, Object> makeMap(String key, Object value) {
+		Map<String, Object> map = new HashMap<>();
+		map.put(key, value);
+		return map;
+	}
+
+	/**
+	 @RequestMapping(path = "/players", method = RequestMethod.POST)
+	 public ResponseEntity<Object> register(@RequestParam String name, @RequestParam String email, @RequestParam String password) {
+
+	 if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+	 return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
+	 }
+
+	 if (playerRepository.findByEmail(email) !=  null) {
+	 return new ResponseEntity<>("Name already in use", HttpStatus.FORBIDDEN);
+	 }
+
+	 playerRepository.save(new Player(name ,email, passwordEncoder.encode(password)));
+	 return new ResponseEntity<>(HttpStatus.CREATED);
+	 }
+	 */
 
 }

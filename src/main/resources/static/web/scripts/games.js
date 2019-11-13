@@ -1,6 +1,35 @@
 
 let scoresJSON=[];
 let tableScores2= document.querySelector("#tableScores2");
+//################### FETCH LOGIN ##################
+let form = new FormData(document.getElementById("login-form"))
+fetch( "/api/login", {
+    method: 'POST',
+    body: form
+}).then(function(res) {
+  if (res.ok) {
+    return res.json();
+  }else{
+    throw new Error(res.text());
+  }
+
+}).then(function(json) {
+    console.log("ajs")
+}).catch(function(error) {
+  console.log( "Request failed: " + error.message );
+});
+
+
+//################### FETCH LOGOUT ##################
+/*
+function logout(evt) {
+  evt.preventDefault();
+  $.post("/app/logout")
+   .done(...)
+   .fail(...);
+}
+*/
+//##################################################
 
 
 fetch( "/api/scores").then(function(response) {
@@ -30,7 +59,7 @@ function createTableLeaderBoard2(){
                   <td>${p.lost}</td>
                   <td>${p.tied}</td>
                 </tr>
-                      `
+                     `
   })
 }
 

@@ -61,11 +61,6 @@ public class Player {
 	    Métodos
 	=====================
 	=====================*/
-    /*
-	@JsonIgnore
-    public Set<GamePlayer> getPlayers() {
-        return gamePlayers;
-    }*/
 
     @JsonIgnore
     public Set<Player> getPlayers(){
@@ -91,7 +86,6 @@ public class Player {
     public String getEmail() {
         return this.email;
     }
-    @JsonIgnore
     public String getPassword() {
         return this.password;
     }
