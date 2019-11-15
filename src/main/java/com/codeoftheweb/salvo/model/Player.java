@@ -149,7 +149,7 @@ public class Player {
 		dto.put("won", wons);
 		dto.put("lost", lost);
 		dto.put("tied", tied);
-		dto.put("userName",userName);
+		dto.put("userName",email);
 
     	return dto;
 	}

@@ -24,8 +24,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// loguearse
 		http.formLogin()
-				.usernameParameter("userName")
-				.passwordParameter("pasword")
+				.usernameParameter("username")
+				.passwordParameter("password")
 				.loginPage("/api/login");
 
 		//desloguearse

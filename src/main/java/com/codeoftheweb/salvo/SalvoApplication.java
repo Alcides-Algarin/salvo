@@ -2,10 +2,12 @@ package com.codeoftheweb.salvo;
 
 import com.codeoftheweb.salvo.model.*;
 import com.codeoftheweb.salvo.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -17,12 +19,15 @@ public class SalvoApplication {
 		SpringApplication.run(SalvoApplication.class, args);
 	}
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
     @Bean
     public CommandLineRunner initData(PlayerRepository playerRepository, GameRepository gameRepository, GamePlayerRepository gamePlayerRepository, ScoreRepository scoreRepository) {
         return (args) -> {
 
             //Players
-            Player jack= new Player("Jack", "j.bauer@ctu.gov", "24");
+            Player jack= new Player("Jack", "j.bauer@ctu.gov", passwordEncoder.encode("24"));
             Player chole= new Player("Chloe", "c.obrian@ctu.gov","42");
             Player kim= new Player("Kim", "kim_bauer@gmail.com","kb");
             Player tony= new Player("Tony", "t.almeida@ctu.gov","mole");

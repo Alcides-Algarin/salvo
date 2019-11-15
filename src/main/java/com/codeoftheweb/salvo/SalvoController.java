@@ -50,7 +50,6 @@ public class SalvoController {
 		}
     	dto.put("games", gameRepository.findAll().stream().map(Game::gameDTO).collect(Collectors.toList()));
     	return dto;
-        //return gameRepository.findAll().stream().map(Game::gameDTO).collect(Collectors.toList());
     }
 
 	@RequestMapping("/scores")
@@ -66,7 +65,6 @@ public class SalvoController {
     private boolean isGuest(Authentication authentication){
 
     	return authentication == null || authentication instanceof AnonymousAuthenticationToken;
-
 	}
 
     private Map<String,Object> gameViewDTO(GamePlayer gamePlayer){
@@ -89,6 +87,8 @@ public class SalvoController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+
+	//REGISTRO DE NUEVOS PLAYERS
 	@RequestMapping(path = "/players", method = RequestMethod.POST)
 	public ResponseEntity<Map<String,Object>> createUser(@RequestParam String userName, @RequestParam String email, @RequestParam String password) {
 
@@ -102,9 +102,8 @@ public class SalvoController {
 			response = new ResponseEntity<>(makeMap(" Error", "userName already exists"), HttpStatus.FORBIDDEN);
 		}else{
 			Player newPlayer=  playerRepository.save(new Player(userName, email, passwordEncoder.encode(password)));
-			response = new ResponseEntity<>(makeMap("id", newPlayer.getId()), HttpStatus.CREATED);
+			response = new ResponseEntity<>(makeMap("email", newPlayer.getEmail()), HttpStatus.CREATED);
 		}
-
 		return response;
 	}
 
@@ -114,7 +113,24 @@ public class SalvoController {
 		return map;
 	}
 
-	/**
+	/*
+	 *   @RequestMapping(path = "/persons", method = RequestMethod.POST)
+	 *   public ResponseEntity<Object> register(
+	 *       @RequestParam first, @RequestParam last,
+	 *       @RequestParam String email, @RequestParam String password) {
+	 *
+	 *     if (firstName.isEmpty() || last.isEmpty() || email.isEmpty() || password.isEmpty()) {
+	 *       return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
+	 *     }
+	 *
+	 *     if (personRepository.findOneByEmail(email) !=  null) {
+	 *       return new ResponseEntity<>("Name already in use", HttpStatus.FORBIDDEN);
+	 *     }
+	 *
+	 *     playerRepository.save(new Person(first, last, email, passwordEncoder.encode(password)));
+	 *     return new ResponseEntity<>(HttpStatus.CREATED);
+	 *   }
+	 * ###############################################################
 	 @RequestMapping(path = "/players", method = RequestMethod.POST)
 	 public ResponseEntity<Object> register(@RequestParam String name, @RequestParam String email, @RequestParam String password) {
 

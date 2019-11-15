@@ -14,7 +14,6 @@ function getGameData(gpId){
 	.then(res => {
 		if(res.ok){
 			return res.json()
-
 		}else{
 			throw new Error(res.statusText)
 		}
@@ -41,8 +40,6 @@ function infoGame(data){
 		document.querySelector("#player").innerHTML+=` Welcome to game  ${data.player}. Esperando oponente`;
 	}
 }
-
-
 
 function getShips(ships){
 

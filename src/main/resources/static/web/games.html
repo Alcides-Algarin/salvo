@@ -15,22 +15,43 @@
     <br>
 
     <div>
-        <form id="login-form">
-            <label>Name: <input type="text" name="userName"></label>
-            <label>Password: <input type="text" name="pasword"></label>
-            <button> Login</button>
+
+        <button id="mostrarLogin" onclick="mostrarLogin()" > Login</button>
+        <button id="mostrarRegister" onclick="mostrarRegister()" >Signup</button>
+
+
+        <form id="login-form" onsubmit="return false">
+            <label>Name: <input type="text" name="username"></label>
+            <label>Password: <input type="text" name="password"></label>
+            <button onclick="login()" > Login</button>
         </form>
+        
+        <br>
 
         <form id="logout-form" onsubmit="return false">
-            <button>Logout</button>
+            <button onclick="logout()" >Logout</button>
         </form>
-    </div>
 
+        <br>
+
+        <form id="Signup-form" onsubmit="return false">
+            <label>Name: <input type="text" name="userName"></label>
+            <label>Email: <input type="text" name="email"></label>
+            <label>Password: <input type="text" name="password"></label>
+            <button onclick="Signup()" > Signup</button>
+        </form>
+
+        
+
+    </div>
 
     <br>
     <div id="gamesList">
     </div>
 
+    <br>
+
+    <h3>GAMES</h3>
     <table >
         <thead>
             <tr>
@@ -43,7 +64,7 @@
 
         </tbody>
     </table>
-
+<!-- 
     <h3>Leaderboard</h3>
     <p>Tabla creadad desde frontEnd</p>
     
@@ -61,6 +82,7 @@
 
         </tbody>
     </table>
+ -->
     <br>
         <h3>Leaderboard</h3>
     <p>Tabla creadad desde BackEnd</p>
