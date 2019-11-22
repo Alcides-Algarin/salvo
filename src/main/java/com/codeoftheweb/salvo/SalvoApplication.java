@@ -63,7 +63,7 @@ public class SalvoApplication {
             GamePlayer gp4= gamePlayerRepository.save(new GamePlayer(tony,game2,LocalDateTime.now().plusHours(1)));
 
             GamePlayer gp5= gamePlayerRepository.save(new GamePlayer(kim,game3,LocalDateTime.now().plusHours(2)));
-            GamePlayer gp6= gamePlayerRepository.save(new GamePlayer(jack,game3,LocalDateTime.now().plusHours(2)));
+            //GamePlayer gp6= gamePlayerRepository.save(new GamePlayer(jack,game3,LocalDateTime.now().plusHours(2)));
 
             // ship location GAMEPLAYER1
             gp1.addShip(new Ship("destroyer", Arrays.asList("A1","A2","A3")));
@@ -100,12 +100,13 @@ public class SalvoApplication {
             gp5.addShip(new Ship("carrier", Arrays.asList("A10","B10","C10","D10","E10")));
             gp5.addShip(new Ship("battleship", Arrays.asList("I1","I2","I3")));
 
-            // ship location GAMEPLAYER4
+            /* ship location GAMEPLAYER6
             gp6.addShip(new Ship("destroyer", Arrays.asList("I1","I2","I3")));
             gp6.addShip(new Ship("submarine", Arrays.asList("A9","B9","C9","D9")));
             gp6.addShip(new Ship("patrol_boat", Arrays.asList("F7","G7")));
             gp6.addShip(new Ship("carrier", Arrays.asList("A10","B10","C10","D10","E10")));
             gp6.addShip(new Ship("battleship", Arrays.asList("A1","A2","A3")));
+            */
 
 
             //salvo location GAMEPLAYER!
@@ -132,7 +133,7 @@ public class SalvoApplication {
             gamePlayerRepository.save(gp3);
             gamePlayerRepository.save(gp4);
             gamePlayerRepository.save(gp5);
-            gamePlayerRepository.save(gp6);
+            //gamePlayerRepository.save(gp6);
 
 
 

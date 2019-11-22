@@ -3,7 +3,7 @@ let data
 let params = new URLSearchParams(location.search);
 let gp = params.get('gp');
 let oponente;
-let shipLocation = []
+let shipLocation = [];
 
 getGameData(gp);
 
