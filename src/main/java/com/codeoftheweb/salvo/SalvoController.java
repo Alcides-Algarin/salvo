@@ -87,18 +87,18 @@ public class SalvoController {
 	//REGISTRO DE NUEVOS PLAYERS
 	//##########################
 	@RequestMapping(path = "/players", method = RequestMethod.POST)
-	public ResponseEntity<Map<String,Object>> createUser(@RequestParam String userName, @RequestParam String email, @RequestParam String password) {
+	public ResponseEntity<Map<String,Object>> createUser(@RequestParam String username, @RequestParam String email, @RequestParam String password) {
 
 		ResponseEntity<Map<String,Object>> response;
 		Player player = playerRepository.findByEmail(email);
 
-		if (email.isEmpty() || password.isEmpty()) {
-			response = new ResponseEntity<>(makeMap(" Error", "no name or password"), HttpStatus.FORBIDDEN);
+		if (email.isEmpty() || password.isEmpty() || username.isEmpty()) {
+			response = new ResponseEntity<>(makeMap("error", "Por favor complete todos los campos"), HttpStatus.FORBIDDEN);
 
 		}else if (player !=  null) {
-			response = new ResponseEntity<>(makeMap(" Error", "userName already exists"), HttpStatus.FORBIDDEN);
+			response = new ResponseEntity<>(makeMap("error", "Ya existe el usuario con el que intenta registrarse"), HttpStatus.FORBIDDEN);
 		}else{
-			Player newPlayer=  playerRepository.save(new Player(userName, email, passwordEncoder.encode(password)));
+			Player newPlayer=  playerRepository.save(new Player(username, email, passwordEncoder.encode(password)));
 			response = new ResponseEntity<>(makeMap("email", newPlayer.getEmail()), HttpStatus.CREATED);
 		}
 		return response;
@@ -110,7 +110,7 @@ public class SalvoController {
 
 		ResponseEntity<Map<String,Object>> response;
 		if(this.isGuest(authentication)){
-			response = new ResponseEntity<>(makeMap("error", "usuario no logueado"), HttpStatus.UNAUTHORIZED);
+			response = new ResponseEntity<>(makeMap("error", "Debe loguearse para primero"), HttpStatus.UNAUTHORIZED);
 		}else{
 			Player player= playerRepository.findByEmail(authentication.getName());
 			Game newGame = gameRepository.save(new Game(LocalDateTime.now()));
@@ -133,9 +133,9 @@ public class SalvoController {
 			response = new ResponseEntity<>(makeMap("error", "usuario no logueado"), HttpStatus.UNAUTHORIZED);
 		}else{
 			if(game==null){
-				response = new ResponseEntity<>(makeMap("error", "No existe el game solicitado"), HttpStatus.NOT_FOUND);
+				response = new ResponseEntity<>(makeMap("error", "No existe el Game solicitado"), HttpStatus.NOT_FOUND);
 			}else if(game.getGamePlayers().size()>1){
-				response = new ResponseEntity<>(makeMap("error", "El game ya se encuentra completo"), HttpStatus.FORBIDDEN);
+				response = new ResponseEntity<>(makeMap("error", "El Game ya se encuentra completo"), HttpStatus.FORBIDDEN);
 			}else{
 				if(game.getGamePlayers().stream().anyMatch(gp -> gp.getPlayer().getId()==player.getId())){
 					response = new ResponseEntity<>(makeMap("error", "No se puede jugar contra si mismo"), HttpStatus.FORBIDDEN);

@@ -3,20 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Games</title>
-    <style>
-        table, th, td {
-          border: 1px solid black;
-          border-collapse: collapse;
-        }
-</style>
+    <link rel="stylesheet" href="styles/myStyle.css" />
 </head>
 <body>
-    <h1 id=welcome >SALVO!!!</h1>
+    <h1 id=welcome ></h1>
     <br>
 
     <div>
 
         <button id="mostrarLogin" onclick="mostrarLogin()" > Login</button>
+        <br>
         <button id="mostrarRegister" onclick="mostrarRegister()" >Signup</button>
 
 
@@ -35,7 +31,7 @@
         <br>
 
         <form id="Signup-form" onsubmit="return false">
-            <label>Name: <input type="text" name="userName"></label>
+            <label>Name: <input type="text" name="username"></label>
             <label>Email: <input type="text" name="email"></label>
             <label>Password: <input type="text" name="password"></label>
             <button onclick="Signup()" > Signup</button>

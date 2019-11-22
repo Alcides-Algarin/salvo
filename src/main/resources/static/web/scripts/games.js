@@ -1,23 +1,49 @@
 
-
+//Declaro las variables
 let tableScores2= document.querySelector("#tableScores2");
 let tableGames= document.querySelector("#tableGames");
 let tableScores= document.querySelector("#tableScores");
-
-document.getElementById("logout-form").style.display="none";
-document.getElementById("Signup-form").style.display="none";
-document.getElementById("login-form").style.display="none";
-document.getElementById("createGame").style.display="none";
-
-
+let welcome= document.querySelector("#welcome");
 let games=[];// 1)declaro un array vacio para guardar lo que me retorna el fetch
 let scoresJSON=[];
 let gamePlayers=[];
 let leaderBoard = [];
 let playerLogin;
 
+
+//Oculto lo que no quiero que se vea al iniciar la pagina
+document.getElementById("logout-form").style.display="none";
+document.getElementById("createGame").style.display="none";
+document.getElementById("Signup-form").style.display="none";
+document.getElementById("login-form").style.display="none";
+
+
+//Al abrir la pagina por primera vez invoco a fetchGames() y fetchScores() para que me muestre la tabla de 
+//isLogin();
 fetchGames();
 fetchScores();
+
+
+//################# Funcion main###################
+// Para garantizar que se muetre informacion dependiendo de si hay alguien logueado antes de cualquier accion verifico si hay un player logueado. 
+
+function  isLogin(){
+  if(games.player=="guest"){
+
+    document.getElementById("logout-form").style.display="none";
+    document.getElementById("createGame").style.display="none";
+    document.getElementById("Signup-form").style.display="none";
+    document.getElementById("login-form").style.display="none";
+    document.getElementById("mostrarRegister").style.display="block";
+    document.getElementById("mostrarLogin").style.display="block";
+
+  }else{
+    document.getElementById("logout-form").style.display="block";
+    document.getElementById("createGame").style.display="block";
+    document.getElementById("mostrarRegister").style.display="none";
+    document.getElementById("mostrarLogin").style.display="none";
+  }
+}
 
 //################# FETCH GAMES ###################
 function fetchGames(){
@@ -33,10 +59,10 @@ function fetchGames(){
     // Hacer algo con el JSON
     // Tenga en cuenta que esto no añade una nueva promesa
     games = json;// 2) asigno  el JSON a la variable que declare despues del fetch
-
-    //createdLeaderboard()
     createTableGames();//invoco a la funcion dentro del then para asegurarme que se ejecute solo despues obtener los datos del servidor
     createTableLeaderBoard();
+    playerActual(games.player);
+    isLogin();
 
   }).catch(function(error) {
     // Se llama cuando se produce un error en cualquier punto de la cadena
@@ -46,11 +72,21 @@ function fetchGames(){
 }
 
 
+//#####################################
+function playerActual(player){
+  player=="guest" ? welcome.innerHTML= ` Welcome to Salvo game.`
+  :
+  welcome.innerHTML= ` Welcome to game  ${player.name}.`;
+}
+
+
 
 //################### FETCH LOGIN ##################
-function login(){
+function login(formulario){
   
-  let form = new FormData(document.getElementById("login-form"));
+  let form;
+
+  formulario==null? form = new FormData(document.getElementById("login-form")) : form = formulario;
   
   fetch( "/api/login", {
      method: 'POST',
@@ -63,6 +99,7 @@ function login(){
       document.getElementById("logout-form").style.display="block";
       document.getElementById("login-form").style.display="none";
       document.getElementById("createGame").style.display="block";
+      document.getElementById("Signup-form").style.display="none";
     }else{
       throw new Error('error');
     }
@@ -72,9 +109,6 @@ function login(){
     alert("Error de logueo. Verifique los datos ingresados. Debe estar previamente registrado para poder loguearse");
 
   });
-
-
-
 }
 
 //################### FETCH LOGOUT ##################
@@ -87,17 +121,17 @@ function logout() {
     if (res.ok) {
       console.log("Logout Exitoso");
       fetchGames();
+      document.getElementById("logout-form").style.display="none";
     }else{
-      throw new Error('error');
+      return Promise.reject(res.json());
       console.log("ERROR  fallo Logout");
     }
 
   }).catch(function(error) {
+    error.then(jsonError => alert(jsonError.error))
     console.log( "Request failed: " + error.message );
   });
 
-  document.getElementById("logout-form").style.display="none";
-  document.getElementById("login-form").style.display="block";
 }
 
 
@@ -105,6 +139,11 @@ function logout() {
 function Signup(){
   
   let form = new FormData(document.getElementById("Signup-form"));
+
+  let form2=new FormData();
+  form2.append("username", form.get("email"));
+  form2.append("password", form.get("password"));
+
   
   fetch( "/api/players", {
      method: 'POST',
@@ -112,14 +151,17 @@ function Signup(){
   }).then(function(res) {
     if (res.ok) {
       console.log("REGISTRO Exitoso");
+      login(form2);
     }else{
-      throw new Error('error');
+      return Promise.reject(res.json());
       console.log("ERROR  FALLO REGISTRO");
     }
 
   }).catch(function(error) {
+    error.then(jsonError => alert(jsonError.error))
     console.log( "Request failed: " + error.message );
   });
+
 
 }
 
@@ -139,6 +181,7 @@ function createGame(){
     newGame= json;
     fetchGames();
     createTableGames();
+    location.href="/web/game.html?gp="+json.gpId
     console.log("Juego creado exitosamente")
 
   }).catch(function(error) {
@@ -150,7 +193,7 @@ function createGame(){
 //################## #####################
 function joinGame(gameId){
 
-  fetch( "/games/${gameId}/players" ,{
+  fetch( `/api/games/${gameId}/players` ,{
     method: 'POST'
 
   }).then(function(response) {
@@ -159,34 +202,18 @@ function joinGame(gameId){
     }
     throw new Error(response.statusText);
   }).then(function(json) {
+
+  
     fetchGames();
     createTableGames();
-    alert("Union Exitosa")
+    location.href="/web/game.html?gp="+json.gpId
+
+
 
   }).catch(function(error) {
     console.log( "Request failed: " + error.message );
   });
 }
-//################## #####################
-/*
-//################## #####################
-function joinGame(){
-
-  fetch( "/games/{gameId}/players",{
-    method: 'POST',
-    body:gameId
-
-  }).then(function(response) {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error(response.statusText);
-  }.catch(function(error) {
-    console.log( "Request failed: " + error.message );
-  }
-}
-//################## #####################
-*/
 
 //################## FETCH SCORES #####################
 function fetchScores(){
@@ -273,50 +300,20 @@ function createTableGames(){
                       <td>${game.gamePlayers.map(gamePlayer => gamePlayer.player.name).join(" VS ") }</td>
 
                     </tr>
-                    `
-
-                    /*${ } Dentro de los bigotes escribo codigo javaScript. 
-
-                    <td>${game.gamePlayers.map(gamePlayer => gamePlayer.player.name).join(" VS ")}</td> En esta linea 
-                    vuelvo a recorrer el array de gamePlayer esta vez con un map. y cocateno lo que me retorna el map(retorna un array)
-                    con un join(" VS ") para que el navegador me muestre juagadorA VS jugadorB
-
-                    */         
+                    `       
       });
   }else{
-/*
-//###############################################################
-
     let playerLogin= games.player;
 
     tableGames.innerHTML="";
-      games.games.forEach(game => {
+    games.games.forEach(game => {
+
+      if(game.gamePlayers.length ==2? true:false){
         tableGames.innerHTML += `
                     <tr>
                       <td>${game.gameId}</td>
                       <td>${game.created}</td>
-                      <td>${game.gamePlayers.map(gp => gp.player.id==playerLogin.id ? `<a href="game.html?gp=${gp.gpId} ">Go to Game</a>` : gp.player.name ).join(" VS ") }
-                      </td>`
-
-
-                    ${ } Dentro de los bigotes escribo codigo javaScript. 
-                    <td>${game.gamePlayers.map(gamePlayer => gamePlayer.player.name).join(" VS ")}</td> En esta linea 
-                    vuelvo a recorrer el array de gamePlayer esta vez con un map. y cocateno lo que me retorna el map(retorna un array)
-                    con un join(" VS ") para que el navegador me muestre juagadorA VS jugadorB
-
-                    */
-//###############################################################
-let playerLogin= games.player;
-
-    tableGames.innerHTML="";
-      games.games.forEach(game => {
-
-        if(game.gamePlayers.length ==2? true:false){
-          tableGames.innerHTML += `
-                    <tr>
-                      <td>${game.gameId}</td>
-                      <td>${game.created}</td>
-                      <td>${game.gamePlayers.map(gp => gp.player.id==playerLogin.id ? ` <span> <button > <a href="game.html?gp=${gp.gpId} " >Go to Game </a></button></span>` : gp.player.name ).join(" VS ") }
+                      <td>${game.gamePlayers.map(gp => gp.player.id==playerLogin.id ? ` <span> <button > <a href="game.html?gp=${gp.gpId}" >Go to Game </a></button></span>` : gp.player.name ).join(" VS ") }
                       </td>
                     </tr>
                     `
@@ -325,20 +322,17 @@ let playerLogin= games.player;
                     <tr>
                       <td>${game.gameId}</td>
                       <td>${game.created}</td>
-                      <td>${game.gamePlayers.map(gp => gp.player.id==playerLogin.id ? ` <span> <button href="game.html?gp=${gp.gpId} ">Go to Game </button></span>`: gp.player.name +` <span> <button data-joinGame="gameId" id="joinGame" onclick="joinGame(${game.gameId})" > Join Game</button>  </span> `) }
+                      <td>${game.gamePlayers.map(gp => gp.player.id==playerLogin.id ? ` <span> <button > <a href="game.html?gp=${gp.gpId}" >Go to Game </a></button></span>` : gp.player.name +` <span> <button data-joinGame="gameId"  id="joinGame" onclick="joinGame(${game.gameId})" > Join Game</button>  </span> `) }
                       </td>
                     </tr>
                     `
-
         }
 
       });
-
-
   }
 }
 
-//################## #####################
+//##################  #####################
 function createTableLeaderBoard(){
 
   leaderBoard.forEach(player => {
@@ -350,9 +344,7 @@ function createTableLeaderBoard(){
                   <td>${player.won}</td>
                   <td>${player.lost}</td>
                   <td>${player.tied}</td>
-                </tr>
-    `
-
+                </tr>`
   })
 }
 
