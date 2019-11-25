@@ -6,9 +6,6 @@ import com.codeoftheweb.salvo.repository.GamePlayerRepository;
 import com.codeoftheweb.salvo.repository.GameRepository;
 import com.codeoftheweb.salvo.repository.PlayerRepository;
 import com.codeoftheweb.salvo.repository.ScoreRepository;
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -143,6 +137,109 @@ public class SalvoController {
 				GamePlayer newGamePlayer= gamePlayerRepository.save(new GamePlayer(player, game, LocalDateTime.now()));
 				response= new ResponseEntity<>(makeMap("gpId", newGamePlayer.getId()), HttpStatus.CREATED);
 				}
+			}
+		}
+		return response;
+	}
+
+	/*
+	 * ser de mente curiosa me abrio puertas al conocimiento
+	 * Al pregutarme como funcionan las cosas en su interior, que es lo que sucede en esa "caja negra" que tienen las "cosas todas"
+	 * Asi fue como tengo en mi haber una variada cantidas de "conocimientos".
+	 *
+	 * Me gusta hacer un paralelismo entre Solucionar un problema electrico en un hogar y la programacion.
+	 * En ambos caso requiere entender una logica que parte de como funciona cada cosa.
+	 * Solucionar un problema electrico requiere conocer como funciona la electricidad:
+	 * Entender como funciona la programacion requiere saber como funciona un sistema informatico.
+	 *VISITAR https://www.leveluplunch.com/java/tutorials/014-post-json-to-spring-rest-webservice/
+	 *para entender mejor REST 
+
+	 */
+	//###############################################################
+
+	@RequestMapping(path="/games/players/{gamePlayerId}/salvos", method=RequestMethod.POST)
+	public ResponseEntity<Map<String,Object>> addSalvoes(Authentication authentication, @PathVariable long gamePlayerId, @RequestBody List <Salvo> salvoes) {
+
+		ResponseEntity<Map<String,Object>> response;
+		GamePlayer gamePlayer= gamePlayerRepository.findById(gamePlayerId).orElse(null);
+
+		if(this.isGuest(authentication)){
+			response = new ResponseEntity<>(makeMap("error", "usuario no logueado"), HttpStatus.UNAUTHORIZED);
+		}else {
+			if(gamePlayer == null) {
+				response = new ResponseEntity<>(makeMap("error", "No existe el gamePlayer solicitado"), HttpStatus.NOT_FOUND);
+			}else {
+
+				salvoes.forEach(ship -> gamePlayer.addSalvo((Salvo) salvoes));
+				gamePlayerRepository.save(gamePlayer);
+
+				response = new ResponseEntity<>(makeMap("success", "ships added"), HttpStatus.CREATED);
+			}
+		}
+		return response;
+	}
+
+	//###############################################################
+	@RequestMapping(path="/games/players/{gamePlayerId}/ships", method=RequestMethod.POST)
+	public ResponseEntity<Map<String,Object>> addShip(Authentication authentication, @PathVariable long gamePlayerId, @RequestBody List <Ship> ships) {
+
+		ResponseEntity<Map<String,Object>> response;
+		GamePlayer gamePlayer= gamePlayerRepository.findById(gamePlayerId).orElse(null);
+
+		//#####################################################
+		//Guardo en una lista todas la ubicaciones permitidas
+		List<String> legacyLocations = new ArrayList<String>();
+
+		for (int i=0 ; i<10 ; i++ ) {
+		    for(int j=1 ; j<11 ; j++){
+		        
+                char b = (char) (i + 65);
+                String c = b + ""+ j;
+                legacyLocations.add(c);
+		    }
+		}
+		//#######################################
+
+
+
+		if(this.isGuest(authentication)){
+			response = new ResponseEntity<>(makeMap("error", "usuario no logueado"), HttpStatus.UNAUTHORIZED);
+		}else {
+			if(gamePlayer == null) {
+				response = new ResponseEntity<>(makeMap("error", "No existe el gamePlayer solicitado"), HttpStatus.NOT_FOUND);
+			}else if (gamePlayer.getShips().size() > 1) {
+				response = new ResponseEntity<>(makeMap("error", "Ya posee los ships ubicados, no es posible volver a ubicarlos"), HttpStatus.FORBIDDEN);
+			}else if(ships.size() != 5) {
+				response = new ResponseEntity<>(makeMap("error", "Se intento crear mas ships de los permitidos. La cantidad permitida es 5"), HttpStatus.FORBIDDEN);
+			}else {
+
+				/*
+				Nueva lista con las ubicaciones
+				List<String> allLocs = new ArrayList<>();
+				ships.forEach(x -> {
+					allLocs.addAll(x.getLocations());
+				});
+
+				 */
+
+				ships.forEach(ship -> gamePlayer.addShip(ship));
+				gamePlayerRepository.save(gamePlayer);
+
+				response = new ResponseEntity<>(makeMap("success", "ships added"), HttpStatus.CREATED);
+				/*
+				Hay que checkear:
+					# -que sea un usuario logueado
+					# - que exista el gamePlayerId
+					# -Que el gamePlayer aun no posea ships
+					# -que los ships sean exactamente 5
+					-que las ubicaciones de los ships esten dentro de las coordenadas de la grilla
+
+
+					-que las posiciones de cada ship sea consecutivas en horizontal o vertical
+					-que las posiciones no se repitan(no se solapen los ships)
+
+				 */
+				
 			}
 		}
 		return response;

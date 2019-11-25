@@ -1,3 +1,5 @@
+
+
 /*creates the grid structure. It requires a size, an element 
 where the grid will be attached to and an id to recognized it. 
 */
