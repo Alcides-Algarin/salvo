@@ -68,7 +68,6 @@ function fetchGames(){
     // Se llama cuando se produce un error en cualquier punto de la cadena
     console.log( "Request failed: " + error.message );
   });
-
 }
 
 

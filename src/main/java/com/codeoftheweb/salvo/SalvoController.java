@@ -158,22 +158,33 @@ public class SalvoController {
 	//###############################################################
 
 	@RequestMapping(path="/games/players/{gamePlayerId}/salvos", method=RequestMethod.POST)
-	public ResponseEntity<Map<String,Object>> addSalvoes(Authentication authentication, @PathVariable long gamePlayerId, @RequestBody List <Salvo> salvoes) {
+	public ResponseEntity<Map<String,Object>> addSalvo(Authentication authentication, @PathVariable long gamePlayerId, @RequestBody List <String> salvoes) {
 
 		ResponseEntity<Map<String,Object>> response;
-		GamePlayer gamePlayer= gamePlayerRepository.findById(gamePlayerId).orElse(null);
+
 
 		if(this.isGuest(authentication)){
 			response = new ResponseEntity<>(makeMap("error", "usuario no logueado"), HttpStatus.UNAUTHORIZED);
 		}else {
+			GamePlayer gamePlayer= gamePlayerRepository.findById(gamePlayerId).orElse(null);
+			Player player= playerRepository.findByEmail(authentication.getName());
+
 			if(gamePlayer == null) {
 				response = new ResponseEntity<>(makeMap("error", "No existe el gamePlayer solicitado"), HttpStatus.NOT_FOUND);
+			}else if(gamePlayer.getPlayer().getId() != player.getId()){
+				response = new ResponseEntity<>(makeMap("error", "usuario no perteneces a este game"), HttpStatus.UNAUTHORIZED);
+			}else if(salvoes.size() != 5){
+				response = new ResponseEntity<>(makeMap("error", "Los salvos recibimos no son correctos"), HttpStatus.FORBIDDEN);
 			}else {
 
-				salvoes.forEach(ship -> gamePlayer.addSalvo((Salvo) salvoes));
+				int turn = 1;
+
+				Salvo salvo = new Salvo(turn, salvoes);
+				gamePlayer.addSalvo(salvo);
+
 				gamePlayerRepository.save(gamePlayer);
 
-				response = new ResponseEntity<>(makeMap("success", "ships added"), HttpStatus.CREATED);
+				response = new ResponseEntity<>(makeMap("success", "salvo recibido con exito"), HttpStatus.CREATED);
 			}
 		}
 		return response;
@@ -185,6 +196,7 @@ public class SalvoController {
 
 		ResponseEntity<Map<String,Object>> response;
 		GamePlayer gamePlayer= gamePlayerRepository.findById(gamePlayerId).orElse(null);
+		Player player= playerRepository.findByEmail(authentication.getName());
 
 		//#####################################################
 		//Guardo en una lista todas la ubicaciones permitidas
@@ -209,6 +221,8 @@ public class SalvoController {
 				response = new ResponseEntity<>(makeMap("error", "No existe el gamePlayer solicitado"), HttpStatus.NOT_FOUND);
 			}else if (gamePlayer.getShips().size() > 1) {
 				response = new ResponseEntity<>(makeMap("error", "Ya posee los ships ubicados, no es posible volver a ubicarlos"), HttpStatus.FORBIDDEN);
+			}else if(gamePlayer.getPlayer().getId() != player.getId()){
+				response = new ResponseEntity<>(makeMap("error", "usuario no perteneces a este game"), HttpStatus.UNAUTHORIZED);
 			}else if(ships.size() != 5) {
 				response = new ResponseEntity<>(makeMap("error", "Se intento crear mas ships de los permitidos. La cantidad permitida es 5"), HttpStatus.FORBIDDEN);
 			}else {
@@ -264,7 +278,7 @@ public class SalvoController {
 			dto.put("gameId", gamePlayer.getGame().getId());
 			dto.put("creationDate", gamePlayer.getGame().getCreationDate());
 			dto.put("gamePlayer", gamePlayer.getGame().getGamePlayers().stream().map(GamePlayer::gamePlayerDTO));
-			dto.put("player", gamePlayer.getPlayer().getName());
+			dto.put("player", gamePlayer.getPlayer().playerDTO() );
 			dto.put("ships", gamePlayer.getShips().stream().map(Ship::shipDTO));
 			dto.put("salvos", gamePlayer.getGame().getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream().map(Salvo::salvoDTO)));
 		}else{
