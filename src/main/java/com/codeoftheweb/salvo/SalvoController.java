@@ -143,17 +143,8 @@ public class SalvoController {
 	}
 
 	/*
-	 * ser de mente curiosa me abrio puertas al conocimiento
-	 * Al pregutarme como funcionan las cosas en su interior, que es lo que sucede en esa "caja negra" que tienen las "cosas todas"
-	 * Asi fue como tengo en mi haber una variada cantidas de "conocimientos".
-	 *
-	 * Me gusta hacer un paralelismo entre Solucionar un problema electrico en un hogar y la programacion.
-	 * En ambos caso requiere entender una logica que parte de como funciona cada cosa.
-	 * Solucionar un problema electrico requiere conocer como funciona la electricidad:
-	 * Entender como funciona la programacion requiere saber como funciona un sistema informatico.
 	 *VISITAR https://www.leveluplunch.com/java/tutorials/014-post-json-to-spring-rest-webservice/
-	 *para entender mejor REST 
-
+	 *para entender mejor REST
 	 */
 	//###############################################################
 
@@ -175,9 +166,9 @@ public class SalvoController {
 				response = new ResponseEntity<>(makeMap("error", "usuario no perteneces a este game"), HttpStatus.UNAUTHORIZED);
 			}else if(salvoes.size() != 5){
 				response = new ResponseEntity<>(makeMap("error", "Los salvos recibimos no son correctos"), HttpStatus.FORBIDDEN);
-			}else {
+			}else{
 
-				int turn = 1;
+				int turn = gamePlayer.getSalvoes().size() +1;
 
 				Salvo salvo = new Salvo(turn, salvoes);
 				gamePlayer.addSalvo(salvo);

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-public class Ship {
+public class  Ship {
     /*===================
     =====================
         Atributos

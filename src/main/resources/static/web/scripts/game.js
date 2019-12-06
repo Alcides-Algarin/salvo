@@ -14,13 +14,12 @@ getGameData(gpId);
 		* Si no los tiene, mostrar los ships en el docks y mostar el boton para "enviarShips"
 			* Una vez que se envian los ships, recargar la pagina y mostar la grilla de salvos y ocultar el boton de enviar.
 			* 
-
 */
 
-function cleanSalvoGrid(){
+/*function cleanSalvoGrid(){
 	document.querySelectorAll(".salvo").classList.toggle("salvo");
 
-}
+}*/
 
 
 
@@ -29,6 +28,7 @@ function getGameData(gpId){
 	fetch(`/api/game_view/${gpId}`)
 	.then(res => {
 		if(res.ok){
+			console.log("gfhghjop")
 			return res.json()
 		}else{
 			throw new Error(res.statusText)
@@ -196,9 +196,11 @@ function getSalvoes(salvoes){
 				document.querySelector("#salvo" + loc).removeEventListener("click", salvoObjetive);// quito el eventListener para no volver a disparar en el mismo lugar
 			}
 		})
-	})
+	});
+
+
 }
-//#######################################################################
+// #######################################################################
 
 function shipsLocation(name){
 

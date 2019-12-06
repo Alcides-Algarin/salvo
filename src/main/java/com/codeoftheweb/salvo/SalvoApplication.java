@@ -28,9 +28,9 @@ public class SalvoApplication {
 
             //Players
             Player jack= new Player("Jack", "j.bauer@ctu.gov", passwordEncoder.encode("24"));
-            Player chole= new Player("Chloe", "c.obrian@ctu.gov","42");
-            Player kim= new Player("Kim", "kim_bauer@gmail.com","kb");
-            Player tony= new Player("Tony", "t.almeida@ctu.gov","mole");
+            Player chole= new Player("Chloe", "c.obrian@ctu.gov",passwordEncoder.encode("24"));
+            Player kim= new Player("Kim", "kim_bauer@gmail.com",passwordEncoder.encode("24"));
+            Player tony= new Player("Tony", "t.almeida@ctu.gov",passwordEncoder.encode("24"));
 
             //Games
             Game game1=new Game(LocalDateTime.now());
@@ -110,12 +110,14 @@ public class SalvoApplication {
 
 
             //salvo location GAMEPLAYER!
+            /*
             gp1.addSalvo(new Salvo(1,Arrays.asList("I1","I2","I6","J5","A3")));
             gp1.addSalvo(new Salvo(2,Arrays.asList("H1","A2","F3","E5","G3")));
             gp1.addSalvo(new Salvo(3,Arrays.asList("A1","J2","I3","D10","D3")));
 
             gp2.addSalvo(new Salvo(1,Arrays.asList("D1","C2","D10","J3","D5")));
             gp2.addSalvo(new Salvo(2,Arrays.asList("E1","D2","F5","J5","D3")));
+             */
 
 
 

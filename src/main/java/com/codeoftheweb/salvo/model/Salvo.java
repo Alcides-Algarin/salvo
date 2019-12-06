@@ -1,12 +1,9 @@
 package com.codeoftheweb.salvo.model;
-
 import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Entity
 public class Salvo {
@@ -29,13 +26,14 @@ public class Salvo {
     @JoinColumn(name="gamePlayer_id")
     private GamePlayer gamePlayer;
 
+	public Salvo(){ }
 
-    public Salvo(){ }
+	public Salvo( int turNumber, List<String> locationSalvo){
+		this.turNumber= turNumber;
+		this.locationSalvo= locationSalvo;
+	}
 
-    public Salvo( int turNumber, List<String> locationSalvo){
-        this.turNumber= turNumber;
-        this.locationSalvo= locationSalvo;
-    }
+
 
     public long getId() {
         return this.id;
@@ -70,6 +68,69 @@ public class Salvo {
         dto.put("turnNumber", this.getTurNumber());
         dto.put("locationSalvo", this.getLocationSalvo());
         dto.put("playerId", this.gamePlayer.getPlayer().getId());
+        dto.put("shipsOponenteKO", this.getKoShips().stream().map(Ship::shipDTO));
+        dto.put("hits", this.getHits(this.locationSalvo));
         return dto;
     }
+
+	public List<String> getHits( List<String> locationSalvo) {
+	    //Este metodo me retorna la lista de disparos positivos a los ships del contrincante
+
+		List<String> hits = new ArrayList<>();
+
+        List<String> oponentShip= this.oponentShips();
+		if(oponentShip!=null){
+            hits.addAll(locationSalvo.stream().filter(salvo->
+                    oponentShip
+                            .stream()
+                            .anyMatch(loc ->loc.equals(salvo))).collect(Collectors.toList()));
+        }
+
+		return hits;
+	}
+
+
+    public List<Ship> getKoShips() {
+        //Return the ships sunked
+
+        List<String> allSalvoes= new ArrayList<>();
+
+        Set<Salvo> salvoes = this.getGamePlayer()
+                .getSalvoes()
+                .stream()
+                .filter(salvo -> salvo.getTurNumber() <= this.getTurNumber())
+                .collect(Collectors.toSet());
+
+        salvoes.forEach(salvo -> allSalvoes.addAll(salvo.getLocationSalvo()));
+
+        long myId= this.gamePlayer.getId();
+        GamePlayer oponent = this.gamePlayer.getGame().getGamePlayers().stream().filter(gp -> gp.getId()!=myId).findFirst().orElse(null);
+
+        Set<Ship> shipsOponente= oponent.getShips();
+
+        System.out.println(allSalvoes +" EL JUGADOR QUE DISPARO ESTOS SALVOES ES  "+this.getGamePlayer().getPlayer().getName());
+
+        return shipsOponente
+                .stream()
+                .filter(ship -> allSalvoes.containsAll(ship.getLocations()))
+                .collect(Collectors.toList());
+    }
+
+
+
+
+	public List<String> oponentShips(){//Metodo para obtener los ships del oponente de este game (si lo tiene)
+
+		List<String> oponentShips = new ArrayList<>();
+        long myId= this.getGamePlayer().getId();
+		GamePlayer oponentGP = this.getGamePlayer().getGame().getGamePlayers().stream().filter(gp -> gp.getId()!=myId).findFirst().orElse(null);
+		if(oponentGP != null){
+			oponentShips.addAll(oponentGP.getShips().stream().flatMap(e -> e.getLocations().stream()).collect(Collectors.toList()));
+		}
+
+		//System.out.println(oponentShips  +" ESTOS SON LOS SHIPS DE SU OPONENTE  " + oponentGP.getPlayer().getName());
+
+		return oponentShips;
+	}
+
 }
