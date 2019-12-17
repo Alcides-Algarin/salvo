@@ -2,7 +2,6 @@ package com.codeoftheweb.salvo.model;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Entity
@@ -68,7 +67,8 @@ public class Salvo {
         dto.put("turnNumber", this.getTurNumber());
         dto.put("locationSalvo", this.getLocationSalvo());
         dto.put("playerId", this.gamePlayer.getPlayer().getId());
-        dto.put("shipsOponenteKO", this.getKoShips().stream().map(Ship::shipDTO));
+        //dto.put("barquitosUndidos", this.shipSunked().size());
+        dto.put("shipSunked", this.gamePlayer.shipSunked().stream().map(Ship::shipDTO));
         dto.put("hits", this.getHits(this.locationSalvo));
         return dto;
     }
@@ -85,37 +85,63 @@ public class Salvo {
                             .stream()
                             .anyMatch(loc ->loc.equals(salvo))).collect(Collectors.toList()));
         }
-
 		return hits;
 	}
 
+	/*
+	public int shipDie(){
+	    int x =0;
 
-    public List<Ship> getKoShips() {
+        Set<Ship> ships = new HashSet<>();
+
+        ships.addAll(this.getKoShips().stream().map(Ship::shipDTO));
+
+        return x;
+    }*/
+
+/*
+    public List<Ship> shipSunked() {
         //Return the ships sunked
 
+        Set<Salvo> salvoes;
         List<String> allSalvoes= new ArrayList<>();
+        long myId;
+        GamePlayer oponent;
+        Set<Ship> shipsOponente;
+        List<Ship> shipSunked;
 
-        Set<Salvo> salvoes = this.getGamePlayer()
+
+        salvoes = this.getGamePlayer()
                 .getSalvoes()
                 .stream()
                 .filter(salvo -> salvo.getTurNumber() <= this.getTurNumber())
                 .collect(Collectors.toSet());
 
         salvoes.forEach(salvo -> allSalvoes.addAll(salvo.getLocationSalvo()));
+        myId= this.gamePlayer.getId();
+        oponent = this.gamePlayer.getGame().getGamePlayers().stream().filter(gp -> gp.getId()!=myId).findFirst().orElse(null);
+        shipsOponente= oponent.getShips();
 
-        long myId= this.gamePlayer.getId();
-        GamePlayer oponent = this.gamePlayer.getGame().getGamePlayers().stream().filter(gp -> gp.getId()!=myId).findFirst().orElse(null);
-
-        Set<Ship> shipsOponente= oponent.getShips();
-
-        System.out.println(allSalvoes +" EL JUGADOR QUE DISPARO ESTOS SALVOES ES  "+this.getGamePlayer().getPlayer().getName());
-
-        return shipsOponente
+        shipSunked = shipsOponente
                 .stream()
                 .filter(ship -> allSalvoes.containsAll(ship.getLocations()))
                 .collect(Collectors.toList());
+
+        System.out.println( "Tamaño"+shipSunked.size());
+
+        shipSunked.forEach(ship -> System.out.println("Type: "+ship.getType()));
+
+
+        return shipSunked;
     }
 
+
+    public int salvosSunked(){
+        //Retorno la cantidad de barquitos hundidos
+        return this.shipSunked().size();
+    }
+
+ */
 
 
 

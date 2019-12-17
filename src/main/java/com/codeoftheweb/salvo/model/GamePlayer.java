@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 public class GamePlayer {
@@ -42,6 +43,8 @@ public class GamePlayer {
         Constructores
     =====================
     =====================*/
+
+
 
     public GamePlayer(){}
 
@@ -100,6 +103,7 @@ public class GamePlayer {
         return this.salvoes;
     }
 
+
     //dto
     public Map<String, Object> gamePlayerDTO(){
         Map<String,Object> dto = new LinkedHashMap<>();
@@ -113,6 +117,41 @@ public class GamePlayer {
             dto.put("score", null);
         }
         return dto;
+    }
+
+    public List<Ship> shipSunked() {
+        //Return the ships sunked
+
+        Set<Salvo> salvoes;
+        List<String> allSalvoes= new ArrayList<>();
+        long myId;
+        GamePlayer oponent;
+        Set<Ship> shipsOponente;
+        List<Ship> shipSunked;
+
+
+        salvoes = this
+                .getSalvoes()
+                .stream()
+                .filter(salvo -> salvo.getTurNumber() <= salvo.getTurNumber())
+                .collect(Collectors.toSet());
+
+        salvoes.forEach(salvo -> allSalvoes.addAll(salvo.getLocationSalvo()));
+        myId= this.getId();
+        oponent = this.getGame().getGamePlayers().stream().filter(gp -> gp.getId()!=myId).findFirst().orElse(null);
+        shipsOponente= oponent.getShips();
+
+        shipSunked = shipsOponente
+                .stream()
+                .filter(ship -> allSalvoes.containsAll(ship.getLocations()))
+                .collect(Collectors.toList());
+
+        System.out.println( "Tamaño"+shipSunked.size());
+
+        shipSunked.forEach(ship -> System.out.println("Type: "+ship.getType()));
+
+
+        return shipSunked;
     }
 
 

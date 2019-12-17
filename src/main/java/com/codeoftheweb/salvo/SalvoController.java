@@ -52,9 +52,11 @@ public class SalvoController {
 
 	@RequestMapping("/scores")
 	public List<Map<String, Object>> getScores() {
-		return playerRepository.findAll().stream().map(Player::scoreDTO).collect(Collectors.toList());//QUE HACE ESTO?
+		return playerRepository.findAll()
+				.stream()
+				.map(Player::scoreDTO)
+				.collect(Collectors.toList());//QUE HACE ESTO?
 	}
-
 
     @RequestMapping("/game_view/{gamePlayerId}")
     public ResponseEntity<Map<String,Object>> getGameView(@PathVariable long gamePlayerId, Authentication authentication){
@@ -78,8 +80,7 @@ public class SalvoController {
         return response;
     }
 
-	//REGISTRO DE NUEVOS PLAYERS
-	//##########################
+
 	@RequestMapping(path = "/players", method = RequestMethod.POST)
 	public ResponseEntity<Map<String,Object>> createUser(@RequestParam String username, @RequestParam String email, @RequestParam String password) {
 
@@ -98,13 +99,12 @@ public class SalvoController {
 		return response;
 	}
 
-	//###############################################################
-	@RequestMapping(path = "/games", method = RequestMethod.POST)
+
 	public ResponseEntity<Map<String,Object>> createGames( Authentication authentication) {
 
 		ResponseEntity<Map<String,Object>> response;
 		if(this.isGuest(authentication)){
-			response = new ResponseEntity<>(makeMap("error", "Debe loguearse para primero"), HttpStatus.UNAUTHORIZED);
+			response = new ResponseEntity<>(makeMap("error", "Debe loguearse"), HttpStatus.UNAUTHORIZED);
 		}else{
 			Player player= playerRepository.findByEmail(authentication.getName());
 			Game newGame = gameRepository.save(new Game(LocalDateTime.now()));
@@ -142,46 +142,80 @@ public class SalvoController {
 		return response;
 	}
 
-	/*
-	 *VISITAR https://www.leveluplunch.com/java/tutorials/014-post-json-to-spring-rest-webservice/
-	 *para entender mejor REST
-	 */
-	//###############################################################
 
 	@RequestMapping(path="/games/players/{gamePlayerId}/salvos", method=RequestMethod.POST)
 	public ResponseEntity<Map<String,Object>> addSalvo(Authentication authentication, @PathVariable long gamePlayerId, @RequestBody List <String> salvoes) {
-
 		ResponseEntity<Map<String,Object>> response;
-
-
 		if(this.isGuest(authentication)){
 			response = new ResponseEntity<>(makeMap("error", "usuario no logueado"), HttpStatus.UNAUTHORIZED);
 		}else {
 			GamePlayer gamePlayer= gamePlayerRepository.findById(gamePlayerId).orElse(null);
-			Player player= playerRepository.findByEmail(authentication.getName());
+			Player player= playerRepository.findByEmail(authentication.getName());//El player actual
+			assert gamePlayer != null;// En caso de que "gamePLayer" sea NULL, se corta la ejecucion del programa
 
-			if(gamePlayer == null) {
-				response = new ResponseEntity<>(makeMap("error", "No existe el gamePlayer solicitado"), HttpStatus.NOT_FOUND);
-			}else if(gamePlayer.getPlayer().getId() != player.getId()){
-				response = new ResponseEntity<>(makeMap("error", "usuario no perteneces a este game"), HttpStatus.UNAUTHORIZED);
-			}else if(salvoes.size() != 5){
-				response = new ResponseEntity<>(makeMap("error", "Los salvos recibimos no son correctos"), HttpStatus.FORBIDDEN);
+			if(gamePlayer.getGame().getGamePlayers().size() == 2){//Controlar que efectivamente existan dos Player en el Game.
+				// Obtengo el gamePlayer del oponente
+				GamePlayer oponentGP= gamePlayer.getGame().getGamePlayers().stream().filter(gp -> gp.getId()!= gamePlayer.getId()).findFirst().orElse(null);
+				int myTurn = gamePlayer.getSalvoes().size();
+				int enemyTurn= oponentGP.getSalvoes().size();
+
+				GamePlayer creadorJuego = gamePlayer.getId() < oponentGP.getId()? gamePlayer : oponentGP;
+				boolean gPlayer1= creadorJuego.getId() < oponentGP.getId();
+
+				if(gamePlayer.getPlayer().getId() != player.getId()){// El player debe pertenecer al este GP
+					response = new ResponseEntity<>(makeMap("error", "usuario no perteneces a este game"), HttpStatus.UNAUTHORIZED);
+				}else if(salvoes.size() != 5){
+					//Mas adelante poner como condicion que la cantidad de disparos sea igual a la cantidad de ships vivos.
+					response = new ResponseEntity<>(makeMap("error", "Los salvos recibidos no son correctos"), HttpStatus.FORBIDDEN);
+				}else if (gamePlayer.shipSunked().size() !=5 || oponentGP.shipSunked().size()!=5){
+					
+					//Es una logica un poco rebuscada, pero funciona.
+					// La idea es que el credor del juego sea el primero en disparar
+					//
+					//Mas adelante debe ser mejorado
+					if(myTurn == enemyTurn && gPlayer1){//Siempre que los turnos sean iguales, el creador del juego es quien va a disparar
+						System.out.println("Entro en el primer if del controler ");
+						Salvo salvo = new Salvo(myTurn, salvoes); //Se crea una instancia de salvo
+						gamePlayer.addSalvo(salvo); //se agrega un salvo al gamePlayer
+						gamePlayerRepository.save(gamePlayer); //Guarda el gamePlayer con los nuevos salvos
+						response = new ResponseEntity<>(makeMap("success", "salvo recibido con exito"), HttpStatus.CREATED); //Respuesta del server exitosa
+
+					}else if(myTurn < enemyTurn && !gPlayer1){// Si los tunos no son iguales, dispara el segundo jugador(el que se unio al juego)
+						System.out.println("Entro en el segundo if del controler ");
+						Salvo salvo = new Salvo(myTurn, salvoes); //Se crea una instancia de salvo
+						gamePlayer.addSalvo(salvo); //se agrega un salvo al gamePlayer
+						gamePlayerRepository.save(gamePlayer); //Guarda el gamePlayer con los nuevos salvos
+						response = new ResponseEntity<>(makeMap("success", "salvo recibido con exito"), HttpStatus.CREATED); //Respuesta del server exitosa
+					}else{
+						response = new ResponseEntity<>(makeMap("error", "Es turno del oponente"), HttpStatus.NOT_FOUND);
+					}
+				}else{
+					//NOTA para mi yo del futuro:
+					//Cambiar la logica de finalizacion del juego.
+					//Por el momento el juego solo finaliza cuando los dos jugadores tienen todos sus barcos undidos.
+					// y los puntajes los esta calculando dos veces( una vez por cada jugador)
+
+					if(gamePlayer.shipSunked().size() == 5 && oponentGP.shipSunked().size()!=5){
+						scoreRepository.save(new Score( gamePlayer.getPlayer(),gamePlayer.getGame(), LocalDateTime.now(), 0));
+						scoreRepository.save(new Score( oponentGP.getPlayer(),oponentGP.getGame(), LocalDateTime.now(), 1));
+					}else if(gamePlayer.shipSunked().size() !=5 && oponentGP.shipSunked().size()==5){
+						scoreRepository.save(new Score( gamePlayer.getPlayer(),gamePlayer.getGame(), LocalDateTime.now(), 1));
+						scoreRepository.save(new Score( oponentGP.getPlayer(),oponentGP.getGame(), LocalDateTime.now(), 0));
+					}else{
+						scoreRepository.save(new Score( gamePlayer.getPlayer(),gamePlayer.getGame(), LocalDateTime.now(), 0.5));
+						scoreRepository.save(new Score( oponentGP.getPlayer(),oponentGP.getGame(), LocalDateTime.now(), 0.5));
+					}
+					response = new ResponseEntity<>(makeMap("error", " El juego finalizo"), HttpStatus.FORBIDDEN);
+				}
 			}else{
-
-				int turn = gamePlayer.getSalvoes().size() +1;
-
-				Salvo salvo = new Salvo(turn, salvoes);
-				gamePlayer.addSalvo(salvo);
-
-				gamePlayerRepository.save(gamePlayer);
-
-				response = new ResponseEntity<>(makeMap("success", "salvo recibido con exito"), HttpStatus.CREATED);
+				response = new ResponseEntity<>(makeMap("error", "Falta un oponente para poder jugar"), HttpStatus.NOT_FOUND);
 			}
+
 		}
 		return response;
 	}
 
-	//###############################################################
+
 	@RequestMapping(path="/games/players/{gamePlayerId}/ships", method=RequestMethod.POST)
 	public ResponseEntity<Map<String,Object>> addShip(Authentication authentication, @PathVariable long gamePlayerId, @RequestBody List <Ship> ships) {
 
@@ -189,8 +223,9 @@ public class SalvoController {
 		GamePlayer gamePlayer= gamePlayerRepository.findById(gamePlayerId).orElse(null);
 		Player player= playerRepository.findByEmail(authentication.getName());
 
-		//#####################################################
 		//Guardo en una lista todas la ubicaciones permitidas
+		//FALTA DESARROLLAR
+		/*
 		List<String> legacyLocations = new ArrayList<String>();
 
 		for (int i=0 ; i<10 ; i++ ) {
@@ -201,8 +236,7 @@ public class SalvoController {
                 legacyLocations.add(c);
 		    }
 		}
-		//#######################################
-
+		 */
 
 
 		if(this.isGuest(authentication)){
@@ -238,11 +272,8 @@ public class SalvoController {
 					# -Que el gamePlayer aun no posea ships
 					# -que los ships sean exactamente 5
 					-que las ubicaciones de los ships esten dentro de las coordenadas de la grilla
-
-
 					-que las posiciones de cada ship sea consecutivas en horizontal o vertical
 					-que las posiciones no se repitan(no se solapen los ships)
-
 				 */
 				
 			}
@@ -250,7 +281,6 @@ public class SalvoController {
 		return response;
 	}
 
-	//###############################################################
 
 	private Map<String, Object> makeMap(String key, Object value) {
 		Map<String, Object> map = new HashMap<>();

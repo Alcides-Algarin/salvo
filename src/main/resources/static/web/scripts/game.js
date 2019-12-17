@@ -28,7 +28,7 @@ function getGameData(gpId){
 	fetch(`/api/game_view/${gpId}`)
 	.then(res => {
 		if(res.ok){
-			console.log("gfhghjop")
+			//console.log("gfhghjop")
 			return res.json()
 		}else{
 			throw new Error(res.statusText)
@@ -75,7 +75,8 @@ function sendShipsLocations(gpId){
 //####################################################################################
 function sendSalvoesLocations(gpId){
 
-	//Al  enviar los ships al servidor, y obtener una respuesta exitosa, hago otro fetch a game_view y actualizo los datos de la pagina
+	//Al  enviar los ships al servidor, y obtener una respuesta exitosa, 
+	//hago otro fetch a game_view y actualizo los datos de la pagina
 	//
 	
 
@@ -168,7 +169,7 @@ for(let i = 0; i < 11; i++){//Agrega un eventListener a todos los grids de la gr
         }
     }
 }
-//#####################################################################
+// #####################################################################
 
 function salvoObjetive(ev){
 		
@@ -180,25 +181,66 @@ function salvoObjetive(ev){
 }
 //  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-function getSalvoes(salvoes){
+function getSalvoes(arrSalvoes){
 
-	salvoes.forEach(salvo => {
+	//*ordenar el arrASalvoes por turnos de manera ascendente
+	arrSalvoes.sort(function (a, b) {
+  		if (a.turnNumber > b.turnNumber) {
+    		return 1;
+  		}else if (a.turnNumber < b.turnNumber) {
+    		return -1;
+  		}else
+  		return 0;
+	})
+
+	//console.log(arrSalvoes);
+
+	let shipSunken=[]//aqui se almacenaran todas las posiciones de los ships undidos del oponente
+
+	let salvoesOponente= arrSalvoes.filter( salvo => salvo.playerId == oponente.id );
+	let mySalvoes = arrSalvoes.filter(salvo => salvo.playerId!= oponente.id );
+
+
+	mySalvoes.forEach(salvo => {// YA FUNCIONA OK
+
+		if (salvo.shipSunked.length >0){
+					
+			salvo.shipSunked.forEach(ship=>{
+
+				ship.locations.forEach(locat =>{
+
+					if(!shipSunken.includes(locat)){
+						shipSunken.push(locat);
+						document.querySelector("#salvo" + locat).classList.remove("hits");
+						document.querySelector("#salvo" + locat).classList.add("sunken");
+					}
+				})
+			})
+		}
+
 		salvo.locationSalvo.forEach(loc => {
-			if(salvo.playerId == oponente.id){
-				if(shipLocation.includes(loc)){
-					document.querySelector("#ships" + loc).style.background = "red";// Cambiar esta linea por una que agregue una classList para luego darle estilo en css
-					document.querySelector("#ships" + loc).innerHTML= salvo.turnNumber;	
+			
+			document.querySelector("#salvo" + loc).innerHTML= salvo.turnNumber;
+			document.querySelector("#salvo" + loc).classList.remove("salvo");//borro la clase "salvo" para luego agregar la clase hits
+			document.querySelector("#salvo" + loc).removeEventListener("click", salvoObjetive);// quito el eventListener para no volver a disparar en el mismo lugar
+
+			if(salvo.hits.includes(loc)){//Si loc es un disparo exitoso
+				if(!shipSunken.includes(loc)){// pero aun no fue undido
+					document.querySelector("#salvo" + loc).classList.add("hits");
 				}
-			}else{
-				document.querySelector("#salvo" + loc).innerHTML= salvo.turnNumber;
-				document.querySelector("#salvo" + loc).classList.remove("salvo");//borro la clase "salvo" para luego agregar la clase hits
-				document.querySelector("#salvo" + loc).classList.add("hits");
-				document.querySelector("#salvo" + loc).removeEventListener("click", salvoObjetive);// quito el eventListener para no volver a disparar en el mismo lugar
+			}else{//Si loc NO fue un disparo exitoso
+				document.querySelector("#salvo" + loc).classList.add("noHits");
 			}
 		})
 	});
 
+	salvoesOponente.forEach(salvo => {//FALTA AGREGAR LA CLASS SUNKEN A LOS SHIPS QUE YA FUERON UNDIDOS 
 
+		salvo.hits.forEach(loc =>{
+			document.querySelector("#ships" + loc).classList.add("hits");
+			document.querySelector("#ships" + loc).innerHTML= salvo.turnNumber;
+		})
+	})
 }
 // #######################################################################
 

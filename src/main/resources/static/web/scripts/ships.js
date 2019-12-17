@@ -94,7 +94,7 @@ const createShips = function(shipType, length, orientation, parent, isStatic){
             event.changedTouches[0].pageY
             );
 
-            
+
         // position it relative again and remove the inline styles that aren't needed anymore
         ship.classList.remove('absolute')
         ship.style.left = '';

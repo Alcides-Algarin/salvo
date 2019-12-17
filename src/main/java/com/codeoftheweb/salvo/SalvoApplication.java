@@ -22,7 +22,7 @@ public class SalvoApplication {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-    @Bean
+	@Bean
     public CommandLineRunner initData(PlayerRepository playerRepository, GameRepository gameRepository, GamePlayerRepository gamePlayerRepository, ScoreRepository scoreRepository) {
         return (args) -> {
 

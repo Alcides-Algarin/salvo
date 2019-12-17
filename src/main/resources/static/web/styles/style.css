@@ -252,5 +252,11 @@
 }
 
 .hits{
-    background-color: green;
+    background-color: green  !important;
+}
+.noHits{
+    background-color: lightblue;
+}
+.sunken{
+    background-color: red;
 }
